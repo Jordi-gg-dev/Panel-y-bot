@@ -100,7 +100,7 @@ class AntiNuke(commands.Cog):
             return
         if executor.id == guild.owner_id:
             return
-        if executor.id in config.OWNER_IDS:
+        if await checks.is_owner(executor.id):
             return
         if executor.bot:
             if await db.antinuke_trustedbot_has(guild.id, executor.id):

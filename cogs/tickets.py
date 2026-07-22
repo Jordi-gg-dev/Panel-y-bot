@@ -137,7 +137,7 @@ async def _cerrar_ticket(interaction: discord.Interaction, ticket_id: int):
         return
 
     is_owner = interaction.user.id == user_id
-    is_staff = checks.is_server_admin(interaction.user) if isinstance(interaction.user, discord.Member) else False
+    is_staff = await checks.is_server_admin(interaction.user) if isinstance(interaction.user, discord.Member) else False
     if not (is_owner or is_staff):
         await interaction.response.send_message("No puedes cerrar este ticket.", ephemeral=True)
         return

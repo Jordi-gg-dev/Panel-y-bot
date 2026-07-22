@@ -41,7 +41,7 @@ class AntiRaidTree(app_commands.CommandTree):
         except Exception:
             log.exception("No se pudo registrar el uso del comando en command_log")
 
-        if interaction.user.id in config.OWNER_IDS:
+        if await checks.is_owner(interaction.user.id):
             return True
 
         if await db.is_user_blacklisted(interaction.user.id):

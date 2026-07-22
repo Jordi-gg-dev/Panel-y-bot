@@ -76,6 +76,14 @@ CREATE TABLE IF NOT EXISTS user_blacklist (
     added_at INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS staff_members (
+    user_id INTEGER PRIMARY KEY,
+    rank TEXT NOT NULL,
+    username TEXT,
+    avatar_url TEXT,
+    added_at INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS premium_guilds (
     guild_id INTEGER PRIMARY KEY,
     stripe_customer_id TEXT,
@@ -435,6 +443,14 @@ async def blacklist_user_remove(user_id: int) -> bool:
 async def is_user_blacklisted(user_id: int) -> bool:
     cur = await conn().execute("SELECT 1 FROM user_blacklist WHERE user_id=?", (user_id,))
     return await cur.fetchone() is not None
+
+
+async def get_staff_rank(user_id: int):
+    """Rango del Staff (Fundador/Co-Fundador/Administrador/...) para este
+    usuario, o None. Tabla gestionada desde el panel (pestaña Staff)."""
+    cur = await conn().execute("SELECT rank FROM staff_members WHERE user_id=?", (user_id,))
+    row = await cur.fetchone()
+    return row[0] if row else None
 
 
 # ---------------------------------------------------------------------------

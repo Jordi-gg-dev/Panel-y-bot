@@ -2,7 +2,9 @@
 
 Este proyecto contiene el bot de Discord **AstroCube Anti-Raid** y su panel web de administración **en un solo sitio**. Antes eran dos proyectos separados que se desplegaban como dos servicios de Railway; se han unido porque Railway no permite compartir un mismo volumen/archivo entre dos servicios distintos, y eso hacía que el panel y el bot NO vieran de verdad los mismos datos (por ejemplo, los mensajes privados que recibía el bot no llegaban a aparecer en el panel). Ahora ambos corren dentro del mismo proceso y comparten el archivo de verdad.
 
-**Acceso al panel restringido**: solo puede entrar quien inicie sesión con la cuenta de Discord que pongas en `OWNER_IDS`. Nadie más puede ni siquiera ver el panel, aunque conozca la URL.
+**Acceso al panel**: cualquier cuenta de Discord puede iniciar sesión, pero solo puede gestionar un servidor si es su dueño o tiene permiso de Administrador/Gestionar Servidor ahí. Los IDs en `OWNER_IDS` son "superadmins": ven todos los servidores del bot y acceden a las páginas Global (dar/quitar Premium a mano, código personalizado, etc.).
+
+**Staff con acceso total (sin tocar OWNER_IDS)**: desde el botón "Staff" del panel puedes añadir a alguien con rango **Fundador**, **Co-Fundador** o **Administrador** y tendrá ese mismo acceso total (todos los servidores, Global, dar Premium...), sin necesidad de meter su ID en `OWNER_IDS`. Los rangos Moderador/Soporte/Colaborador son solo decorativos (no dan permisos). Para delegar solo la bandeja de mensajes privados sin dar acceso total, usa "Acceso de moderador" en vez del Staff.
 
 ---
 

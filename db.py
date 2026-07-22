@@ -584,6 +584,12 @@ def remove_staff_member(user_id: int) -> None:
     _execute("DELETE FROM staff_members WHERE user_id = ?", (user_id,))
 
 
+def get_staff_rank(user_id: int) -> str | None:
+    """Rango del Staff para este usuario, o None si no está en el equipo."""
+    row = _fetchone("SELECT rank FROM staff_members WHERE user_id = ?", (user_id,))
+    return row[0] if row else None
+
+
 def list_staff_members():
     return _fetchall(
         "SELECT user_id, rank, username, avatar_url, added_at FROM staff_members ORDER BY added_at ASC"

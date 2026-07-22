@@ -56,7 +56,7 @@ class AntiSpam(commands.Cog):
     async def on_message(self, message: discord.Message):
         if message.author.bot or not message.guild or not isinstance(message.author, discord.Member):
             return
-        if checks.is_server_admin(message.author):
+        if await checks.is_server_admin(message.author):
             return
         if not await db.get_bool(message.guild.id, "antispam_enabled", True):
             return

@@ -7,6 +7,13 @@ Gestionar Servidor ahí (comprobado en vivo contra la API de Discord). Los IDs
 en OWNER_IDS (.env) son "superadmins": ven todos los servidores del bot y
 acceden además a las páginas globales (Global, Código personalizado).
 
+Además, cualquier miembro del Staff (botón "Staff" del navbar) con rango
+Fundador, Co-Fundador o Administrador tiene ese mismo acceso total, aunque no
+esté en OWNER_IDS: ven todos los servidores, pueden dar/quitar Premium desde
+Global, añadir a otros al Staff, etc. Los rangos Moderador/Soporte/Colaborador
+son solo decorativos (no dan permisos extra) — usa "Acceso de moderador"
+(panel_moderators) si solo quieres delegar la bandeja de mensajes privados.
+
 El panel habla directamente con la API de Discord (con el token del bot) y
 con la base de datos SQLite que también usa el bot, así que los cambios se
 aplican al instante.
@@ -58,6 +65,12 @@ TABS = [
 # del navbar superior (equipo del propio bot/panel, no de un servidor concreto).
 STAFF_RANKS = ["Fundador", "Co-Fundador", "Administrador", "Moderador", "Soporte", "Colaborador"]
 
+# Estos 3 rangos dan acceso TOTAL de propietario en el panel (igual que estar
+# en OWNER_IDS): ven todos los servidores, Global (dar/quitar Premium), Código
+# personalizado, Actividad, etc. El resto de rangos (Moderador/Soporte/
+# Colaborador) son solo decorativos y no dan ningún permiso extra por sí solos.
+FULL_ACCESS_STAFF_RANKS = {"Fundador", "Co-Fundador", "Administrador"}
+
 
 def login_required(view):
     """Cualquier cuenta de Discord puede iniciar sesión. El acceso concreto a
@@ -72,7 +85,12 @@ def login_required(view):
 
 
 def _is_owner(user_id: int) -> bool:
-    return user_id in config.OWNER_IDS
+    if user_id in config.OWNER_IDS:
+        return True
+    # Staff con rango Fundador/Co-Fundador/Administrador = acceso total,
+    # igual que estar en OWNER_IDS (ver FULL_ACCESS_STAFF_RANKS arriba).
+    rank = db.get_staff_rank(user_id) if user_id else None
+    return rank in FULL_ACCESS_STAFF_RANKS
 
 
 def owner_required(view):
