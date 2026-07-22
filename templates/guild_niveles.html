@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+{% include "_page_header.html" %}
+
+<div class="card mb-6">
+  <div class="font-bold text-white mb-3">⚙️ Configuración del sistema de niveles</div>
+  <form method="post" action="{{ url_for('niveles_save', guild_id=guild_id) }}" class="space-y-4">
+    <label class="flex items-center gap-3">
+      <span class="toggle">
+        <input type="checkbox" name="xp_enabled" {{ "checked" if niveles_cfg.xp_enabled }}>
+        <span class="slider"></span>
+      </span>
+      <span class="text-sm text-slate-200">Sistema de niveles activado</span>
+    </label>
+
+    <div class="grid md:grid-cols-3 gap-3">
+      <div>
+        <label class="field-label">XP mínimo por mensaje</label>
+        <input type="number" name="xp_min" value="{{ niveles_cfg.xp_min }}" min="1">
+      </div>
+      <div>
+        <label class="field-label">XP máximo por mensaje</label>
+        <input type="number" name="xp_max" value="{{ niveles_cfg.xp_max }}" min="1">
+      </div>
+      <div>
+        <label class="field-label">Cooldown entre mensajes (segundos)</label>
+        <input type="number" name="xp_cooldown" value="{{ niveles_cfg.xp_cooldown }}" min="0">
+      </div>
+    </div>
+
+    <div>
+      <label class="field-label">Canal para anunciar subidas de nivel</label>
+      <select name="xp_levelup_channel">
+        <option value="">Mismo canal donde escribió el mensaje</option>
+        {% for c in text_channels %}
+          <option value="{{ c.id }}" {{ "selected" if niveles_cfg.xp_levelup_channel == c.id|string }}>#{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-3 border-t border-white/5 pt-4">
+      <div>
+        <label class="field-label flex items-center gap-1.5">
+          Multiplicador de XP
+          <span class="pill" style="background: rgba(245,158,11,0.15); color:#f59e0b;">💎 Premium</span>
+        </label>
+        <input type="number" name="xp_multiplier" value="{{ niveles_cfg.xp_multiplier }}" min="0.1" max="10" step="0.1" {{ "disabled class=opacity-50" if not is_premium }}>
+      </div>
+      <div>
+        <label class="field-label flex items-center gap-1.5">
+          Color de la tarjeta de /nivel
+          <span class="pill" style="background: rgba(245,158,11,0.15); color:#f59e0b;">💎 Premium</span>
+        </label>
+        <input type="text" name="rank_color" value="{{ niveles_cfg.rank_color }}" placeholder="Ej: FF5733" {{ "disabled class=opacity-50" if not is_premium }}>
+      </div>
+    </div>
+    {% if not is_premium %}
+    <p class="text-xs text-slate-500">Hazte Premium para ganar más XP con un multiplicador y personalizar el color de tu tarjeta de nivel.</p>
+    {% endif %}
+
+    <button type="submit" class="btn-primary">Guardar</button>
+  </form>
+</div>
+
+<div class="card mb-6">
+  <div class="font-bold text-white mb-3 flex items-center gap-1.5">
+    🎁 Roles de recompensa por nivel
+    <span class="pill" style="background: rgba(245,158,11,0.15); color:#f59e0b;">💎 Premium</span>
+  </div>
+  {% if is_premium %}
+  <form method="post" action="{{ url_for('niveles_rol_nivel_add', guild_id=guild_id) }}" class="grid md:grid-cols-3 gap-3 mb-4">
+    <div>
+      <label class="field-label">Nivel</label>
+      <input type="number" name="level" min="1" required>
+    </div>
+    <div>
+      <label class="field-label">Rol a otorgar</label>
+      <select name="role_id" required>
+        {% for r in roles %}
+          <option value="{{ r.id }}">@{{ r.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="flex items-end">
+      <button type="submit" class="btn-primary">Añadir recompensa</button>
+    </div>
+  </form>
+  <div class="space-y-2">
+    {% for level, role_id in role_rewards %}
+    <div class="flex items-center justify-between text-sm bg-white/5 rounded-lg px-3 py-2">
+      <span>Nivel <strong>{{ level }}</strong> → rol {{ role_id }}</span>
+      <form method="post" action="{{ url_for('niveles_rol_nivel_eliminar', guild_id=guild_id, level=level) }}">
+        <button type="submit" class="text-xs text-red-400 hover:text-red-300 font-semibold">Quitar</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="text-xs text-slate-400">Sin recompensas configuradas todavía.</div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-sm text-slate-400">Con Premium puedes hacer que el bot otorgue un rol automáticamente cuando alguien alcanza cierto nivel.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="font-bold text-white mb-3">🏆 Clasificación (top 10)</div>
+  {% if top %}
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-left text-slate-400">
+        <th class="py-2">#</th>
+        <th>Usuario</th>
+        <th>Nivel</th>
+        <th>XP</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user_id, username, xp, level in top %}
+      <tr class="border-t border-white/5">
+        <td class="py-2">{{ loop.index }}</td>
+        <td>{{ username }}</td>
+        <td>{{ level }}</td>
+        <td>{{ xp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="text-center text-slate-400">Todavía no hay nadie con XP en este servidor.</div>
+  {% endif %}
+</div>
+{% endblock %}

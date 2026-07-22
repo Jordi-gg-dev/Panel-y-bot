@@ -1,0 +1,47 @@
+"""AstroCube Panel - Configuración (lee .env)."""
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def _parse_id_list(raw: str) -> list[int]:
+    if not raw:
+        return []
+    return [int(x.strip()) for x in raw.split(",") if x.strip().isdigit()]
+
+
+BOT_TOKEN: str = os.getenv("DISCORD_TOKEN", "")
+
+DISCORD_CLIENT_ID: str = os.getenv("DISCORD_CLIENT_ID", "")
+DISCORD_CLIENT_SECRET: str = os.getenv("DISCORD_CLIENT_SECRET", "")
+REDIRECT_URI: str = os.getenv("REDIRECT_URI", "http://localhost:5000/callback")
+
+OWNER_IDS: list[int] = _parse_id_list(os.getenv("OWNER_IDS", ""))
+
+FLASK_SECRET_KEY: str = os.getenv("FLASK_SECRET_KEY", "cambia-esto-por-algo-aleatorio")
+
+# Ruta al archivo de base de datos SQLite. En Railway, apunta esto a la
+# carpeta donde montes el Volume persistente (ej: /data/antiraid.db) para que
+# no se borre en cada redeploy. Bot y panel viven ahora en el mismo proyecto
+# (un solo servicio de Railway), así que por defecto usan la misma carpeta
+# data/ junto a este archivo — ya no dependen de una carpeta "hermana".
+DB_PATH: str = os.getenv("DB_PATH") or os.path.join(os.path.dirname(__file__), "data", "antiraid.db")
+
+PANEL_PORT: int = int(os.getenv("PORT") or os.getenv("PANEL_PORT", "5000"))
+
+# --- Stripe (suscripciones Premium por servidor) ---
+STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+STRIPE_PRICE_ID: str = os.getenv("STRIPE_PRICE_ID", "")
+
+# URL publica del panel (para construir los enlaces de vuelta de Stripe Checkout).
+# En Railway, pon aqui el dominio que te genere (ej: https://tu-panel.up.railway.app)
+PUBLIC_BASE_URL: str = os.getenv("PUBLIC_BASE_URL", "http://localhost:5000")
+
+BOT_NAME = "AstroCube Anti-Raid"
+
+# Enlace de invitación a tu servidor de Discord de soporte/comunidad, para el
+# botón "Únete a mi Servidor" del panel. Sobreescribible desde el .env.
+SUPPORT_SERVER_INVITE: str = os.getenv("SUPPORT_SERVER_INVITE", "https://discord.gg/jRdnjBqVK")

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-6">
+  <div class="text-xs text-slate-500 font-semibold mb-1">Panel de AstroCube</div>
+  <h1 class="text-2xl font-extrabold text-white">🎨 Perfil del bot</h1>
+  <p class="text-sm text-slate-400 mt-1">Cambia el avatar y el banner globales del bot (se ven en cualquier servidor y en su tarjeta de perfil de Discord). Solo tú puedes hacerlo.</p>
+</div>
+
+{% if bot_user %}
+<div class="card mb-6 flex items-center gap-3">
+  {% if bot_user.get('avatar') %}
+    <img src="https://cdn.discordapp.com/avatars/{{ bot_user['id'] }}/{{ bot_user['avatar'] }}.png" class="w-14 h-14 rounded-full">
+  {% endif %}
+  <div>
+    <div class="text-white font-bold">{{ bot_user.get('username', 'AstroCube') }}</div>
+    <div class="text-xs text-slate-500">ID: {{ bot_user.get('id') }}</div>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    <div>
+      <label class="field-label">Avatar (imagen cuadrada, ej. el cubo)</label>
+      <input type="file" name="avatar" accept="image/png,image/jpeg,image/gif">
+    </div>
+    <div>
+      <label class="field-label">Banner (imagen horizontal, ej. "ASTROCUBE STUDIOS")</label>
+      <input type="file" name="banner" accept="image/png,image/jpeg,image/gif">
+    </div>
+    <p class="text-[11px] text-slate-500">Puedes subir solo una de las dos si quieres cambiar únicamente esa. Discord puede tardar unos minutos en mostrar el cambio, y a veces pide reiniciar el cliente.</p>
+    <button type="submit" class="btn-primary">Actualizar perfil del bot</button>
+  </form>
+</div>
+{% endblock %}
