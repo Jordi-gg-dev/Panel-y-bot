@@ -46,7 +46,12 @@
     {% endfor %}
   </div>
   {% else %}
-  <div class="text-center text-slate-400 py-8">No gestionas ningún servidor todavía. Invita al bot a tu servidor y vuelve aquí para activar Premium.</div>
+  <div class="text-center text-slate-400 py-8">
+    <p class="mb-4">No gestionas ningún servidor todavía. Invita al bot a tu servidor y vuelve aquí para activar Premium.</p>
+    <a href="https://discord.com/oauth2/authorize?client_id=1528108198396039279&permissions=8&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="btn-primary inline-flex items-center gap-1.5">
+      🔗 Invitar al bot a tu servidor
+    </a>
+  </div>
   {% endif %}
 </div>
 {% endblock %}

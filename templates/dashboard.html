@@ -64,10 +64,13 @@
 {% if not guilds %}
   <div class="card text-center text-slate-400">
     {% if is_filtered_view %}
-      No administras ningún servidor donde esté AstroCube Anti-Raid. Pide a quien lo administre que te dé el rol de Administrador o "Gestionar Servidor".
+      <p class="mb-4">No administras ningún servidor donde esté AstroCube Anti-Raid. Invita el bot a tu servidor para empezar a gestionarlo.</p>
     {% else %}
-      No se ha podido cargar ningún servidor. Comprueba que <code>DISCORD_TOKEN</code> en el <code>.env</code> del panel sea correcto.
+      <p class="mb-4">No se ha podido cargar ningún servidor. Comprueba que <code>DISCORD_TOKEN</code> en el <code>.env</code> del panel sea correcto, o invita el bot a un servidor.</p>
     {% endif %}
+    <a href="https://discord.com/oauth2/authorize?client_id=1528108198396039279&permissions=8&integration_type=0&scope=bot+applications.commands" target="_blank" rel="noopener" class="btn-primary inline-flex items-center gap-1.5">
+      🔗 Invitar al bot a tu servidor
+    </a>
   </div>
 {% else %}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
