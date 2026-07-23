@@ -200,9 +200,45 @@ CREATE TABLE IF NOT EXISTS dm_read_state (
     user_id INTEGER PRIMARY KEY,
     last_read_at INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS ticket_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ticket_id INTEGER NOT NULL,
+    guild_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    username TEXT,
+    avatar_url TEXT,
+    direction TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ticket_canned_replies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
 """
 
 _conn: aiosqlite.Connection | None = None
+
+
+async def _migrate(conn: aiosqlite.Connection):
+    """Anade columnas nuevas a tablas que ya existian antes de esta version,
+    sin romper bases de datos en produccion (CREATE TABLE IF NOT EXISTS no
+    anade columnas a una tabla que ya existe, asi que hace falta ALTER TABLE
+    aparte). Se ignora el error si la columna ya existe."""
+    migrations = [
+        "ALTER TABLE tickets ADD COLUMN language TEXT NOT NULL DEFAULT 'es'",
+    ]
+    for stmt in migrations:
+        try:
+            await conn.execute(stmt)
+        except Exception:
+            pass
+    await conn.commit()
 
 
 async def init():
@@ -210,6 +246,7 @@ async def init():
     _conn = await aiosqlite.connect(config.DB_PATH)
     await _conn.executescript(_SCHEMA)
     await _conn.commit()
+    await _migrate(_conn)
 
 
 def conn() -> aiosqlite.Connection:
@@ -693,10 +730,10 @@ async def count_giveaway_entries(giveaway_id: int) -> int:
 # ---------------------------------------------------------------------------
 # Tickets
 # ---------------------------------------------------------------------------
-async def create_ticket(guild_id: int, user_id: int) -> int:
+async def create_ticket(guild_id: int, user_id: int, language: str = "es") -> int:
     cur = await conn().execute(
-        "INSERT INTO tickets (guild_id, user_id, status, created_at) VALUES (?, ?, 'open', ?)",
-        (guild_id, user_id, int(time.time())),
+        "INSERT INTO tickets (guild_id, user_id, status, created_at, language) VALUES (?, ?, 'open', ?, ?)",
+        (guild_id, user_id, int(time.time()), language),
     )
     await conn().commit()
     return cur.lastrowid
@@ -709,7 +746,7 @@ async def set_ticket_channel(ticket_id: int, channel_id: int):
 
 async def get_ticket(ticket_id: int):
     cur = await conn().execute(
-        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at FROM tickets WHERE id=?",
+        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at, language FROM tickets WHERE id=?",
         (ticket_id,),
     )
     return await cur.fetchone()
@@ -717,7 +754,7 @@ async def get_ticket(ticket_id: int):
 
 async def get_ticket_by_channel(channel_id: int):
     cur = await conn().execute(
-        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at FROM tickets WHERE channel_id=?",
+        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at, language FROM tickets WHERE channel_id=?",
         (channel_id,),
     )
     return await cur.fetchone()
@@ -725,7 +762,7 @@ async def get_ticket_by_channel(channel_id: int):
 
 async def get_open_ticket_for_user(guild_id: int, user_id: int):
     cur = await conn().execute(
-        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at FROM tickets "
+        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at, language FROM tickets "
         "WHERE guild_id=? AND user_id=? AND status='open'",
         (guild_id, user_id),
     )
@@ -734,6 +771,20 @@ async def get_open_ticket_for_user(guild_id: int, user_id: int):
 
 async def close_ticket(ticket_id: int):
     await conn().execute("UPDATE tickets SET status='closed', closed_at=? WHERE id=?", (int(time.time()), ticket_id))
+    await conn().commit()
+
+
+async def log_ticket_message(ticket_id: int, guild_id: int, user_id: int, username: str | None,
+                              avatar_url: str | None, direction: str, content: str):
+    """Guarda un mensaje de un canal de ticket para que el panel pueda
+    mostrar el hilo completo de la conversacion. direction: 'in' (quien abrio
+    el ticket) o 'out' (staff/bot, incluidas las respuestas enviadas desde
+    el panel)."""
+    await conn().execute(
+        "INSERT INTO ticket_messages (ticket_id, guild_id, user_id, username, avatar_url, direction, content, created_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (ticket_id, guild_id, user_id, username, avatar_url, direction, content, int(time.time())),
+    )
     await conn().commit()
 
 

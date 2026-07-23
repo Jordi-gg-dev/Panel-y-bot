@@ -932,9 +932,11 @@ def guild_detail(guild_id):
             "transcript_channel_id": db.get_config(guild_id, "tickets_transcript_channel"),
         }
         tickets_list = db.list_tickets(guild_id)
+        canned_replies = db.list_canned_replies(guild_id)
         return render_template(
             "guild_tickets.html", tab=tab, guild_id=guild_id, counts=counts,
             categories=categories, tickets_cfg=tickets_cfg, tickets_list=tickets_list,
+            canned_replies=canned_replies,
             is_premium=db.is_premium(guild_id), **ctx,
         )
 
@@ -976,14 +978,109 @@ def tickets_publicar(guild_id):
     try:
         api.send_message_with_buttons(
             config.BOT_TOKEN, int(channel_id),
-            "🎫 Soporte",
-            "¿Necesitas ayuda? Pulsa el botón de abajo para abrir un ticket privado con el staff.",
-            [{"label": "Abrir ticket", "custom_id": "astrocube:ticket:abrir", "emoji": "🎫"}],
+            "🎫 Soporte / Support",
+            "¿Necesitas ayuda? Elige tu idioma y pulsa el botón para abrir un ticket privado con el staff.\n"
+            "Need help? Choose your language and click the button to open a private ticket with staff.",
+            [
+                {"label": "Abrir ticket", "custom_id": "astrocube:ticket:abrir:es", "emoji": "🇪🇸"},
+                {"label": "Open ticket", "custom_id": "astrocube:ticket:abrir:en", "emoji": "🇬🇧"},
+            ],
         )
     except api.DiscordAPIError as exc:
         flash(f"No se pudo publicar el panel: {exc}", "error")
         return redirect(url_for("guild_detail", guild_id=guild_id, tab="tickets"))
     flash("Panel de tickets publicado.", "success")
+    return redirect(url_for("guild_detail", guild_id=guild_id, tab="tickets"))
+
+
+@app.route("/guild/<int:guild_id>/tickets/<int:ticket_id>")
+@login_required
+@guild_access_required
+def guild_ticket_thread(guild_id, ticket_id):
+    ticket = db.get_ticket(ticket_id)
+    if not ticket or ticket[1] != guild_id:
+        flash("No se encontró ese ticket.", "error")
+        return redirect(url_for("guild_detail", guild_id=guild_id, tab="tickets"))
+
+    _, tguild_id, channel_id, opener_id, status, created_at, closed_at, language = ticket
+    messages = db.list_ticket_messages(ticket_id)
+    entries = [
+        {
+            "id": m[0], "ticket_id": m[1], "user_id": m[2], "username": m[3],
+            "avatar_url": m[4], "direction": m[5], "content": m[6], "created_at": m[7],
+        }
+        for m in messages
+    ]
+    thread_username = next((e["username"] for e in reversed(entries) if e["direction"] == "in" and e["username"]), None) or str(opener_id)
+    thread_avatar = next((e["avatar_url"] for e in reversed(entries) if e["direction"] == "in" and e["avatar_url"]), None)
+    canned_replies = db.list_canned_replies(guild_id)
+
+    return render_template(
+        "guild_ticket_thread.html", guild_id=guild_id, ticket_id=ticket_id,
+        channel_id=channel_id, opener_id=opener_id, status=status, language=language,
+        entries=entries, thread_username=thread_username, thread_avatar=thread_avatar,
+        canned_replies=canned_replies,
+    )
+
+
+@app.route("/guild/<int:guild_id>/tickets/<int:ticket_id>/responder", methods=["POST"])
+@login_required
+@guild_access_required
+def ticket_reply(guild_id, ticket_id):
+    ticket = db.get_ticket(ticket_id)
+    if not ticket or ticket[1] != guild_id:
+        flash("No se encontró ese ticket.", "error")
+        return redirect(url_for("guild_detail", guild_id=guild_id, tab="tickets"))
+
+    _, _, channel_id, opener_id, status, _, _, language = ticket
+    content = request.form.get("content", "").strip()
+    if not content:
+        flash("Escribe algo antes de enviar.", "error")
+        return redirect(url_for("guild_ticket_thread", guild_id=guild_id, ticket_id=ticket_id))
+    if status != "open":
+        flash("Este ticket ya está cerrado.", "error")
+        return redirect(url_for("guild_ticket_thread", guild_id=guild_id, ticket_id=ticket_id))
+    if not channel_id:
+        flash("Este ticket no tiene un canal asociado.", "error")
+        return redirect(url_for("guild_ticket_thread", guild_id=guild_id, ticket_id=ticket_id))
+
+    try:
+        api.send_channel_text(config.BOT_TOKEN, int(channel_id), content)
+    except api.DiscordAPIError as exc:
+        flash(f"No se pudo enviar el mensaje: {exc}", "error")
+        return redirect(url_for("guild_ticket_thread", guild_id=guild_id, ticket_id=ticket_id))
+
+    db.log_ticket_message(
+        ticket_id, guild_id, session.get("user_id"), session.get("username"),
+        None, "out", content,
+    )
+    flash("Mensaje enviado.", "success")
+    return redirect(url_for("guild_ticket_thread", guild_id=guild_id, ticket_id=ticket_id))
+
+
+@app.route("/guild/<int:guild_id>/tickets/respuestas/crear", methods=["POST"])
+@login_required
+@guild_access_required
+def canned_reply_add(guild_id):
+    title = request.form.get("title", "").strip()
+    content = request.form.get("content", "").strip()
+    if not title or not content:
+        flash("Rellena el título y el contenido de la respuesta rápida.", "error")
+    else:
+        db.add_canned_reply(guild_id, title, content)
+        flash("Respuesta rápida añadida.", "success")
+    return redirect(url_for("guild_detail", guild_id=guild_id, tab="tickets"))
+
+
+@app.route("/guild/<int:guild_id>/tickets/respuestas/<int:reply_id>/eliminar", methods=["POST"])
+@login_required
+@guild_access_required
+def canned_reply_remove(guild_id, reply_id):
+    db.remove_canned_reply(reply_id, guild_id)
+    flash("Respuesta rápida eliminada.", "success")
+    ref = request.referrer
+    if ref and "/tickets/" in ref and ref.rstrip("/").split("/")[-1].isdigit():
+        return redirect(ref)
     return redirect(url_for("guild_detail", guild_id=guild_id, tab="tickets"))
 
 

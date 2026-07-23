@@ -201,8 +201,36 @@ _conn.executescript(
         user_id INTEGER PRIMARY KEY,
         last_read_at INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS ticket_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ticket_id INTEGER NOT NULL,
+        guild_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        username TEXT,
+        avatar_url TEXT,
+        direction TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS ticket_canned_replies (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        guild_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+    );
     """
 )
+_conn.commit()
+
+# Anade columnas nuevas a tablas que ya existian antes de esta version (ver
+# database.py:_migrate para la explicacion completa). Se ignora el error si
+# la columna ya existe.
+for _stmt in ("ALTER TABLE tickets ADD COLUMN language TEXT NOT NULL DEFAULT 'es'",):
+    try:
+        _conn.execute(_stmt)
+    except sqlite3.OperationalError:
+        pass
 _conn.commit()
 
 
@@ -899,10 +927,10 @@ def count_giveaway_entries(giveaway_id: int) -> int:
 # ---------------------------------------------------------------------------
 # Tickets
 # ---------------------------------------------------------------------------
-def create_ticket(guild_id: int, user_id: int) -> int:
+def create_ticket(guild_id: int, user_id: int, language: str = "es") -> int:
     cur = _execute(
-        "INSERT INTO tickets (guild_id, user_id, status, created_at) VALUES (?, ?, 'open', ?)",
-        (guild_id, user_id, int(time.time())),
+        "INSERT INTO tickets (guild_id, user_id, status, created_at, language) VALUES (?, ?, 'open', ?, ?)",
+        (guild_id, user_id, int(time.time()), language),
     )
     return cur.lastrowid
 
@@ -913,14 +941,21 @@ def set_ticket_channel(ticket_id: int, channel_id: int):
 
 def get_ticket(ticket_id: int):
     return _fetchone(
-        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at FROM tickets WHERE id=?",
+        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at, language FROM tickets WHERE id=?",
         (ticket_id,),
+    )
+
+
+def get_ticket_by_channel(channel_id: int):
+    return _fetchone(
+        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at, language FROM tickets WHERE channel_id=?",
+        (channel_id,),
     )
 
 
 def get_open_ticket_for_user(guild_id: int, user_id: int):
     return _fetchone(
-        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at FROM tickets "
+        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at, language FROM tickets "
         "WHERE guild_id=? AND user_id=? AND status='open'",
         (guild_id, user_id),
     )
@@ -933,12 +968,12 @@ def close_ticket(ticket_id: int):
 def list_tickets(guild_id: int, status: str = None):
     if status:
         return _fetchall(
-            "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at FROM tickets "
+            "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at, language FROM tickets "
             "WHERE guild_id=? AND status=? ORDER BY created_at DESC",
             (guild_id, status),
         )
     return _fetchall(
-        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at FROM tickets "
+        "SELECT id, guild_id, channel_id, user_id, status, created_at, closed_at, language FROM tickets "
         "WHERE guild_id=? ORDER BY created_at DESC",
         (guild_id,),
     )
@@ -947,6 +982,51 @@ def list_tickets(guild_id: int, status: str = None):
 def tickets_open_count(guild_id: int) -> int:
     row = _fetchone("SELECT COUNT(*) FROM tickets WHERE guild_id=? AND status='open'", (guild_id,))
     return row[0] if row else 0
+
+
+def log_ticket_message(ticket_id: int, guild_id: int, user_id: int, username: str | None,
+                        avatar_url: str | None, direction: str, content: str):
+    _execute(
+        "INSERT INTO ticket_messages (ticket_id, guild_id, user_id, username, avatar_url, direction, content, created_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (ticket_id, guild_id, user_id, username, avatar_url, direction, content, int(time.time())),
+    )
+
+
+def list_ticket_messages(ticket_id: int):
+    return _fetchall(
+        "SELECT id, ticket_id, user_id, username, avatar_url, direction, content, created_at "
+        "FROM ticket_messages WHERE ticket_id=? ORDER BY created_at ASC",
+        (ticket_id,),
+    )
+
+
+# --- Respuestas rápidas (plantillas de texto para responder tickets con un clic) ---
+def add_canned_reply(guild_id: int, title: str, content: str) -> int:
+    cur = _execute(
+        "INSERT INTO ticket_canned_replies (guild_id, title, content, created_at) VALUES (?, ?, ?, ?)",
+        (guild_id, title, content, int(time.time())),
+    )
+    return cur.lastrowid
+
+
+def remove_canned_reply(reply_id: int, guild_id: int):
+    _execute("DELETE FROM ticket_canned_replies WHERE id=? AND guild_id=?", (reply_id, guild_id))
+
+
+def list_canned_replies(guild_id: int):
+    return _fetchall(
+        "SELECT id, guild_id, title, content, created_at FROM ticket_canned_replies "
+        "WHERE guild_id=? ORDER BY created_at ASC",
+        (guild_id,),
+    )
+
+
+def get_canned_reply(reply_id: int, guild_id: int):
+    return _fetchone(
+        "SELECT id, guild_id, title, content, created_at FROM ticket_canned_replies WHERE id=? AND guild_id=?",
+        (reply_id, guild_id),
+    )
 
 
 # ---------------------------------------------------------------------------

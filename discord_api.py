@@ -195,6 +195,19 @@ def send_dm_text(token: str, user_id: int, content: str) -> dict:
     return resp.json()
 
 
+def send_channel_text(token: str, channel_id: int, content: str) -> dict:
+    """Envía un mensaje de texto normal (sin embed) a un canal de servidor
+    (por ejemplo, el canal de un ticket), pensado para responder desde el
+    panel como si fuera un mensaje normal del staff."""
+    resp = _request(
+        "POST", f"{API_BASE}/channels/{channel_id}/messages",
+        headers=_headers(token), json={"content": content},
+    )
+    if resp.status_code not in (200, 201):
+        raise DiscordAPIError(f"No se pudo enviar el mensaje ({resp.status_code}: {resp.text[:200]})")
+    return resp.json()
+
+
 def create_channel(token: str, guild_id: int, name: str, channel_type: int = 0, parent_id: int | None = None) -> dict:
     payload = {"name": name, "type": channel_type}
     if parent_id:

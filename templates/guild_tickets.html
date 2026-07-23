@@ -61,27 +61,58 @@
   </div>
 </div>
 
-<div class="card">
-  <div class="font-bold text-white mb-3">🎫 Tickets</div>
-  <table class="w-full text-sm">
-    <thead>
-      <tr class="text-left text-slate-400">
-        <th class="py-2">ID</th>
-        <th>Usuario</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for tid, tguild, channel_id, user_id, status, created_at, closed_at in tickets_list %}
-      <tr class="border-t border-white/5">
-        <td class="py-2">#{{ tid }}</td>
-        <td>{{ user_id }}</td>
-        <td><span class="pill {{ 'pill-on' if status == 'open' else 'pill-off' }}">{{ 'Abierto' if status == 'open' else 'Cerrado' }}</span></td>
-      </tr>
+<div class="grid md:grid-cols-2 gap-4 mb-6">
+  <div class="card">
+    <div class="font-bold text-white mb-3">🎫 Tickets</div>
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-slate-400">
+          <th class="py-2">ID</th>
+          <th>Usuario</th>
+          <th>Idioma</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tid, tguild, channel_id, user_id, status, created_at, closed_at, language in tickets_list %}
+        <tr class="border-t border-white/5">
+          <td class="py-2">#{{ tid }}</td>
+          <td>{{ user_id }}</td>
+          <td><span class="pill" style="background: rgba(255,255,255,0.06);">{{ '🇪🇸 ES' if language == 'es' else '🇬🇧 EN' }}</span></td>
+          <td><span class="pill {{ 'pill-on' if status == 'open' else 'pill-off' }}">{{ 'Abierto' if status == 'open' else 'Cerrado' }}</span></td>
+          <td class="text-right"><a href="{{ url_for('guild_ticket_thread', guild_id=guild_id, ticket_id=tid) }}" class="btn-ghost" style="padding: 4px 12px; font-size: 12px; display: inline-block;">Ver hilo →</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="py-4 text-center text-slate-400">Todavía no se ha abierto ningún ticket.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="font-bold text-white mb-3">⚡ Respuestas rápidas</div>
+    <p class="text-sm text-slate-400 mb-3">Plantillas de texto que el staff puede enviar con un clic al responder un ticket desde el panel.</p>
+    <form method="post" action="{{ url_for('canned_reply_add', guild_id=guild_id) }}" class="space-y-2 mb-4">
+      <input type="text" name="title" placeholder="Título (ej. Saludo inicial)" required maxlength="60">
+      <textarea name="content" placeholder="Contenido de la respuesta…" required rows="2" class="w-full"></textarea>
+      <button type="submit" class="btn-primary">+ Añadir respuesta</button>
+    </form>
+    <div class="space-y-2">
+      {% for rid, rguild, title, content, created_at in canned_replies %}
+      <div class="flex items-center justify-between gap-2 rounded-lg border border-white/5 bg-black/20 px-3 py-2">
+        <div class="min-w-0">
+          <div class="text-sm font-semibold text-white truncate">{{ title }}</div>
+          <div class="text-xs text-slate-500 truncate">{{ content }}</div>
+        </div>
+        <form method="post" action="{{ url_for('canned_reply_remove', guild_id=guild_id, reply_id=rid) }}">
+          <button type="submit" class="text-xs text-red-400 hover:text-red-300 shrink-0">Eliminar</button>
+        </form>
+      </div>
       {% else %}
-      <tr><td colspan="3" class="py-4 text-center text-slate-400">Todavía no se ha abierto ningún ticket.</td></tr>
+      <p class="text-sm text-slate-500">Todavía no hay respuestas rápidas.</p>
       {% endfor %}
-    </tbody>
-  </table>
+    </div>
+  </div>
 </div>
 {% endblock %}

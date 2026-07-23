@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-6 flex items-center gap-3">
+  <img src="{{ thread_avatar or 'https://cdn.discordapp.com/embed/avatars/0.png' }}" class="w-12 h-12 rounded-full">
+  <div class="min-w-0">
+    <div class="text-xs text-slate-500 font-semibold mb-0.5">
+      <a href="{{ url_for('guild_detail', guild_id=guild_id, tab='tickets') }}" class="hover:text-white">← Tickets</a>
+    </div>
+    <h1 class="text-xl font-extrabold text-white truncate">Ticket #{{ ticket_id }} · {{ thread_username }}</h1>
+    <div class="text-xs text-slate-500 flex items-center gap-2">
+      <span>ID: {{ opener_id }}</span>
+      <span class="pill" style="background: rgba(255,255,255,0.06);">{{ '🇪🇸 ES' if language == 'es' else '🇬🇧 EN' }}</span>
+      <span class="pill {{ 'pill-on' if status == 'open' else 'pill-off' }}">{{ 'Abierto' if status == 'open' else 'Cerrado' }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="space-y-3 max-h-[55vh] overflow-y-auto" id="ticket-scroll">
+    {% for e in entries %}
+    <div class="flex {{ 'justify-end' if e.direction == 'out' else 'justify-start' }}">
+      <div class="max-w-[75%] rounded-xl px-3 py-2 {{ 'bg-orange-600/20 border border-orange-600/30' if e.direction == 'out' else 'bg-black/30 border border-white/5' }}">
+        <div class="text-xs text-slate-400 mb-0.5">{{ e.username or ('Staff' if e.direction == 'out' else 'Usuario') }}</div>
+        <div class="text-sm text-slate-100 whitespace-pre-wrap break-words">{{ e.content }}</div>
+        <div class="text-[10px] text-slate-500 mt-1 epoch-cell" data-ts="{{ e.created_at }}">—</div>
+      </div>
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-500 text-center py-6">Todavía no hay mensajes en este ticket.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% if canned_replies %}
+<div class="card mb-4">
+  <div class="font-bold text-white mb-2 text-sm">⚡ Respuestas rápidas</div>
+  <div class="flex flex-wrap gap-2">
+    {% for rid, rguild, title, content, created_at in canned_replies %}
+    <button type="button" class="pill pill-accent canned-reply-btn" style="cursor:pointer; border:none;" data-content="{{ content }}">{{ title }}</button>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  {% if status == 'open' %}
+  <form method="post" action="{{ url_for('ticket_reply', guild_id=guild_id, ticket_id=ticket_id) }}" class="flex gap-2">
+    <input type="text" id="reply-content" name="content" placeholder="Escribe una respuesta…" required class="flex-1" autocomplete="off">
+    <button type="submit" class="btn-primary whitespace-nowrap">Enviar</button>
+  </form>
+  <p class="text-[11px] text-slate-500 mt-2">El mensaje se envía como el bot dentro del canal del ticket en Discord.</p>
+  {% else %}
+  <p class="text-sm text-slate-400">Este ticket está cerrado, ya no se pueden enviar mensajes.</p>
+  {% endif %}
+</div>
+
+<script>
+  document.querySelectorAll(".epoch-cell").forEach(el => {
+    const ts = parseInt(el.dataset.ts, 10);
+    const label = new Date(ts * 1000).toLocaleString();
+    el.textContent = label;
+  });
+  const scrollBox = document.getElementById("ticket-scroll");
+  if (scrollBox) scrollBox.scrollTop = scrollBox.scrollHeight;
+  document.querySelectorAll(".canned-reply-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const input = document.getElementById("reply-content");
+      if (input) { input.value = btn.dataset.content; input.focus(); }
+    });
+  });
+</script>
+{% endblock %}
