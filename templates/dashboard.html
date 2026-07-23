@@ -1,15 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="card relative overflow-hidden mb-6 !p-0">
-  <div class="absolute inset-0 bg-gradient-to-br from-orange-600/10 via-transparent to-amber-400/5 pointer-events-none"></div>
-  <div class="relative flex flex-col sm:flex-row sm:items-center gap-5 p-6">
-    <div class="w-16 h-16 shrink-0 drop-shadow-[0_0_18px_rgba(90,168,240,0.3)]">
+<div class="card mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center gap-5">
+    <div class="w-11 h-11 shrink-0">
       <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="AstroCube" class="w-full h-full">
     </div>
     <div class="flex-1 min-w-0">
-      <div class="text-[11px] tracking-[0.2em] uppercase text-slate-500 font-bold mb-1">Panel de AstroCube</div>
-      <h1 class="text-2xl font-extrabold text-white">Servidores</h1>
+      <div class="text-[11px] tracking-[0.15em] uppercase text-slate-500 font-semibold mb-1">Panel de AstroCube</div>
+      <h1 class="text-xl font-bold text-white">Servidores</h1>
       {% if is_filtered_view %}
       <p class="text-sm text-slate-400 mt-1">Servidores donde eres administrador y AstroCube Anti-Raid está instalado. Elige uno para gestionarlo.</p>
       {% else %}
@@ -17,13 +16,13 @@
       {% endif %}
     </div>
     {% if bot_user %}
-    <div class="flex items-center gap-2 bg-black/30 border border-white/5 rounded-xl px-3 py-2 shrink-0">
+    <div class="flex items-center gap-2.5 surface-2 border border-white/[0.06] rounded-lg px-3 py-2 shrink-0">
       {% if bot_user.get('avatar') %}
         <img src="https://cdn.discordapp.com/avatars/{{ bot_user['id'] }}/{{ bot_user['avatar'] }}.png" class="w-8 h-8 rounded-full">
       {% endif %}
       <div class="text-xs">
-        <div class="text-white font-bold leading-none">{{ bot_user.get('username', 'AstroCube') }}</div>
-        <div class="text-emerald-400 font-semibold mt-1">🟢 En línea</div>
+        <div class="text-white font-semibold leading-none">{{ bot_user.get('username', 'AstroCube') }}</div>
+        <div class="text-emerald-400 font-medium mt-1.5 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> En línea</div>
       </div>
     </div>
     {% endif %}
@@ -31,30 +30,30 @@
 </div>
 
 <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-  <div class="card">
-    <div class="text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-1">Servidores</div>
-    <div class="text-2xl font-extrabold text-white">{{ guilds|length }}</div>
+  <div class="stat-card">
+    <div class="stat-label">Servidores</div>
+    <div class="stat-value">{{ guilds|length }}</div>
   </div>
-  <div class="card">
-    <div class="text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-1">Premium</div>
-    <div class="text-2xl font-extrabold text-amber-400">💎 {{ total_premium_guilds }}</div>
+  <div class="stat-card">
+    <div class="stat-label">Premium</div>
+    <div class="stat-value brand-accent">{{ total_premium_guilds }}</div>
   </div>
-  <div class="card">
-    <div class="text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-1">Reportes abiertos</div>
-    <div class="text-2xl font-extrabold text-orange-400">{{ total_open_reports }}</div>
+  <div class="stat-card">
+    <div class="stat-label">Reportes abiertos</div>
+    <div class="stat-value">{{ total_open_reports }}</div>
   </div>
-  <div class="card">
-    <div class="text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-1">Incidentes 24h</div>
-    <div class="text-2xl font-extrabold text-white">{{ total_incidents_24h }}</div>
+  <div class="stat-card">
+    <div class="stat-label">Incidentes 24h</div>
+    <div class="stat-value">{{ total_incidents_24h }}</div>
   </div>
-  <div class="card">
-    <div class="text-[11px] uppercase tracking-wider text-slate-500 font-bold mb-1">Tareas pendientes</div>
-    <div class="text-2xl font-extrabold text-white">{{ total_pending_tasks }}</div>
+  <div class="stat-card">
+    <div class="stat-label">Tareas pendientes</div>
+    <div class="stat-value">{{ total_pending_tasks }}</div>
   </div>
 </div>
 
 <div class="card mb-6">
-  <div class="font-bold text-white mb-1">🔎 Gestionar un servidor por ID</div>
+  <div class="font-semibold text-white mb-1 flex items-center gap-2">{{ icons.icon('search') }} Gestionar un servidor por ID</div>
   <p class="text-xs text-slate-400 mb-3">Si el bot está en un servidor que no ves en la lista de abajo (por ejemplo, uno donde también eres administrador), busca su ID aquí para entrar directamente.</p>
   <form method="post" action="{{ url_for('dashboard_buscar_servidor') }}" class="flex flex-col sm:flex-row gap-2">
     <input type="text" name="guild_id" placeholder="ID del servidor" required class="flex-1">

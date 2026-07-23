@@ -10,25 +10,25 @@
 <body class="min-h-screen text-slate-200 flex items-center justify-center">
   <div class="w-full max-w-sm">
     <div class="flex flex-col items-center mb-8">
-      <div class="w-24 h-24 mb-4 drop-shadow-[0_0_25px_rgba(90,168,240,0.35)]">
+      <div class="w-14 h-14 mb-4">
         <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="AstroCube" class="w-full h-full">
       </div>
-      <div class="text-3xl font-extrabold text-white tracking-tight">ASTRO<span class="text-orange-400">CUBE</span></div>
-      <div class="text-[11px] tracking-[0.3em] uppercase text-slate-500 font-semibold mt-1">Anti-Raid · Panel privado</div>
+      <div class="text-xl font-bold text-white tracking-tight">Astro<span class="brand-accent">Cube</span></div>
+      <div class="text-[11px] tracking-[0.2em] uppercase text-slate-500 font-medium mt-1.5">Anti-Raid · Panel privado</div>
     </div>
 
     <div class="card">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
-            <div class="mb-4 px-4 py-3 rounded-xl text-sm font-medium bg-red-500/10 text-red-400 border border-red-500/20">{{ message }}</div>
+            <div class="mb-4 px-4 py-3 rounded-lg text-sm font-medium bg-red-500/10 text-red-400 border border-red-500/20">{{ message }}</div>
           {% endfor %}
         {% endif %}
       {% endwith %}
 
       {% if misconfigured %}
         <p class="text-sm text-amber-400 mb-4">
-          ⚠️ Falta configurar <code class="text-amber-300">DISCORD_CLIENT_ID</code> y <code class="text-amber-300">DISCORD_CLIENT_SECRET</code> en el <code>.env</code> del panel. Revisa el README.
+          Falta configurar <code class="text-amber-300">DISCORD_CLIENT_ID</code> y <code class="text-amber-300">DISCORD_CLIENT_SECRET</code> en el <code>.env</code> del panel. Revisa el README.
         </p>
       {% else %}
         <p class="text-sm text-slate-400 mb-5 text-center">Inicia sesión con Discord. Si eres administrador de un servidor donde está AstroCube Anti-Raid, podrás gestionarlo aquí.</p>

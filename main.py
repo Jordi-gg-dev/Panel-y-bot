@@ -68,15 +68,29 @@ class AntiRaidTree(app_commands.CommandTree):
         return True
 
     async def on_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        # discord.py envuelve la excepción real de un comando dentro de
+        # CommandInvokeError (error.original). Sin desenvolverla aquí, un
+        # discord.Forbidden (bot sin permisos en ese canal/servidor) nunca
+        # coincidía con el "isinstance(error, discord.Forbidden)" de abajo
+        # y siempre caía en el mensaje genérico "Ha ocurrido un error", sin
+        # decir la causa real. Desenvolvemos antes de comprobar el tipo.
+        original = getattr(error, "original", error)
+
         if isinstance(error, (checks.NotAdmin, checks.NotOwner)):
             embed = embeds.error("Permiso denegado", str(error) or "No tienes permisos para usar este comando.")
         elif isinstance(error, app_commands.CommandOnCooldown):
             embed = embeds.warning("Espera un momento", f"Cooldown activo. Inténtalo en {error.retry_after:.1f}s.")
-        elif isinstance(error, discord.Forbidden):
-            embed = embeds.error("Permisos insuficientes", "El bot no tiene permisos suficientes. Revisa su rol y posición en la lista de roles del servidor.")
+        elif isinstance(original, discord.Forbidden):
+            embed = embeds.error(
+                "Permisos insuficientes",
+                "El bot no tiene permisos suficientes para hacer esto AQUÍ. Revisa: 1) que el rol del bot tenga "
+                "'Ver canal' y 'Enviar mensajes' en este canal/categoría (a veces un canal tiene permisos "
+                "personalizados que se lo bloquean), y 2) que el rol del bot esté correctamente colocado en la "
+                "lista de roles del servidor.",
+            )
         else:
-            log.error("Error en comando %s: %s", getattr(interaction.command, "qualified_name", "?"), error)
-            traceback.print_exception(type(error), error, error.__traceback__)
+            log.error("Error en comando %s: %s", getattr(interaction.command, "qualified_name", "?"), original)
+            traceback.print_exception(type(original), original, original.__traceback__)
             embed = embeds.error("Ha ocurrido un error", "El error fue registrado. Inténtalo de nuevo más tarde.")
 
         try:

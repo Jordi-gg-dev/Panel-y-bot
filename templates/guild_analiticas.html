@@ -38,7 +38,7 @@
         <span class="text-slate-500">{{ count }}</span>
       </div>
       <div class="h-2 rounded-full bg-white/5 overflow-hidden">
-        <div class="h-full bg-gradient-to-r from-orange-600 to-amber-400" style="width: {{ (count / max_count * 100)|round(1) }}%"></div>
+        <div class="h-full" style="width: {{ (count / max_count * 100)|round(1) }}%; background: var(--accent);"></div>
       </div>
     </div>
     {% endfor %}

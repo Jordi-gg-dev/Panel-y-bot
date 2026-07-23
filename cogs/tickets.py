@@ -172,7 +172,15 @@ class Tickets(commands.Cog):
             "🎫 Soporte",
             "¿Necesitas ayuda? Pulsa el boton de abajo para abrir un ticket privado con el staff.",
         )
-        await interaction.channel.send(embed=embed, view=OpenTicketView())
+        try:
+            await interaction.channel.send(embed=embed, view=OpenTicketView())
+        except discord.Forbidden:
+            await interaction.response.send_message(
+                f"No tengo permiso para escribir en {interaction.channel.mention}. Revisa los permisos de este "
+                "canal (a veces tiene overrides propios): mi rol necesita 'Ver canal' y 'Enviar mensajes' aquí.",
+                ephemeral=True,
+            )
+            return
         await interaction.response.send_message("Panel de tickets publicado.", ephemeral=True)
 
     @app_commands.command(name="ticket-cerrar", description="Cierra el ticket actual (usalo dentro del canal del ticket)")
