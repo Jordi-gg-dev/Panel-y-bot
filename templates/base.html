@@ -97,11 +97,21 @@
           </a>
           {% endif %}
           {% if is_owner %}
-          <a href="{{ url_for('activity_page') }}" class="nav-item {% if request.endpoint == 'activity_page' %}active{% endif %}">{{ icons.icon('activity') }} Actividad</a>
-          <a href="{{ url_for('global_page') }}" class="nav-item {% if request.endpoint == 'global_page' %}active{% endif %}">{{ icons.icon('globe') }} Global</a>
-          <a href="{{ url_for('command_log_page') }}" class="nav-item {% if request.endpoint == 'command_log_page' %}active{% endif %}">{{ icons.icon('clipboard-check') }} Comandos</a>
-          <a href="{{ url_for('bot_profile_page') }}" class="nav-item {% if request.endpoint == 'bot_profile_page' %}active{% endif %}">{{ icons.icon('user-circle') }} Perfil del bot</a>
-          <a href="{{ url_for('code_page') }}" class="nav-item {% if request.endpoint == 'code_page' %}active{% endif %}">{{ icons.icon('code') }} Código</a>
+          <a href="{{ url_for('activity_page') }}" class="nav-item {% if request.endpoint == 'activity_page' %}active{% endif %}">
+            <span class="flex items-center gap-2.5">{{ icons.icon('activity') }} Actividad</span>
+          </a>
+          <a href="{{ url_for('global_page') }}" class="nav-item {% if request.endpoint == 'global_page' %}active{% endif %}">
+            <span class="flex items-center gap-2.5">{{ icons.icon('globe') }} Global</span>
+          </a>
+          <a href="{{ url_for('command_log_page') }}" class="nav-item {% if request.endpoint == 'command_log_page' %}active{% endif %}">
+            <span class="flex items-center gap-2.5">{{ icons.icon('clipboard-check') }} Comandos</span>
+          </a>
+          <a href="{{ url_for('bot_profile_page') }}" class="nav-item {% if request.endpoint == 'bot_profile_page' %}active{% endif %}">
+            <span class="flex items-center gap-2.5">{{ icons.icon('user-circle') }} Perfil del bot</span>
+          </a>
+          <a href="{{ url_for('code_page') }}" class="nav-item {% if request.endpoint == 'code_page' %}active{% endif %}">
+            <span class="flex items-center gap-2.5">{{ icons.icon('code') }} Código</span>
+          </a>
           {% endif %}
         {% endif %}
       </div>
