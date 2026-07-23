@@ -41,6 +41,7 @@
 <div class="card mb-6">
   <div class="font-bold text-white mb-1">🧑‍💼 Staff — equipo mostrado en el botón "Staff" del panel</div>
   <p class="text-xs text-slate-400 mb-4">Da de alta a alguien como Staff eligiendo su rango. Aparecerá con su ID, avatar y rango en el desplegable "Staff" de la barra superior.</p>
+  {% if is_true_owner %}
   <form method="post" action="{{ url_for('global_staff_add') }}" class="flex flex-col sm:flex-row gap-2 mb-4">
     <input type="text" name="user_id" placeholder="ID de usuario" required class="flex-1">
     <select name="rank" required class="flex-1">
@@ -51,6 +52,9 @@
     </select>
     <button type="submit" class="btn-primary whitespace-nowrap">➕ Añadir al Staff</button>
   </form>
+  {% else %}
+  <p class="text-xs pill pill-accent mb-4 !inline-flex">Solo el propietario del bot puede añadir, quitar o cambiar rangos del Staff.</p>
+  {% endif %}
   <div class="space-y-2">
     {% for member in staff_list %}
     <div class="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2">
@@ -64,10 +68,12 @@
           </div>
         </div>
       </div>
+      {% if is_true_owner %}
       <form method="post" action="{{ url_for('global_staff_remove') }}">
         <input type="hidden" name="user_id" value="{{ member.user_id }}">
         <button type="submit" class="text-xs text-red-400 hover:text-red-300 font-semibold shrink-0">Quitar</button>
       </form>
+      {% endif %}
     </div>
     {% else %}
     <div class="text-xs text-slate-500">Ningún miembro del Staff añadido todavía.</div>
@@ -78,10 +84,14 @@
 <div class="card mb-6">
   <div class="font-bold text-white mb-1">🛡️ Moderadores del panel</div>
   <p class="text-xs text-slate-400 mb-4">Dales acceso a personas de tu confianza a funciones concretas del panel sin hacerlas propietarias (por ahora: la bandeja de Mensajes privados). Tú siempre tienes acceso a todo.</p>
+  {% if is_true_owner %}
   <form method="post" action="{{ url_for('global_mod_add') }}" class="flex flex-col sm:flex-row gap-2 mb-4">
     <input type="text" name="user_id" placeholder="ID de usuario" required class="flex-1">
     <button type="submit" class="btn-primary whitespace-nowrap">➕ Dar acceso de moderador</button>
   </form>
+  {% else %}
+  <p class="text-xs pill pill-accent mb-4 !inline-flex">Solo el propietario del bot puede dar o quitar acceso de moderador.</p>
+  {% endif %}
   <div class="space-y-2">
     {% for mod in panel_moderators %}
     <div class="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2">
@@ -92,10 +102,12 @@
           <div class="text-xs text-slate-500">ID: <code>{{ mod.user_id }}</code></div>
         </div>
       </div>
+      {% if is_true_owner %}
       <form method="post" action="{{ url_for('global_mod_remove') }}">
         <input type="hidden" name="user_id" value="{{ mod.user_id }}">
         <button type="submit" class="text-xs text-red-400 hover:text-red-300 font-semibold shrink-0">Quitar</button>
       </form>
+      {% endif %}
     </div>
     {% else %}
     <div class="text-xs text-slate-500">Todavía no has dado acceso de moderador a nadie.</div>

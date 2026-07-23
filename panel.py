@@ -84,11 +84,20 @@ def login_required(view):
     return wrapped
 
 
+def _is_true_owner(user_id: int) -> bool:
+    """Solo el/los ID(s) reales de OWNER_IDS (.env). Ni Fundador, ni
+    Co-Fundador, ni Administrador delegados cuentan aquí a propósito:
+    esto protege la gestión del propio Staff/moderadores para que nadie
+    delegado pueda auto-ascenderse ni dar acceso a otras personas."""
+    return bool(user_id) and user_id in config.OWNER_IDS
+
+
 def _is_owner(user_id: int) -> bool:
-    if user_id in config.OWNER_IDS:
+    if _is_true_owner(user_id):
         return True
     # Staff con rango Fundador/Co-Fundador/Administrador = acceso total,
-    # igual que estar en OWNER_IDS (ver FULL_ACCESS_STAFF_RANKS arriba).
+    # igual que estar en OWNER_IDS (ver FULL_ACCESS_STAFF_RANKS arriba),
+    # EXCEPTO gestionar el propio Staff/moderadores (ver true_owner_required).
     rank = db.get_staff_rank(user_id) if user_id else None
     return rank in FULL_ACCESS_STAFF_RANKS
 
@@ -99,6 +108,20 @@ def owner_required(view):
     @functools.wraps(view)
     def wrapped(*args, **kwargs):
         if not _is_owner(session.get("user_id")):
+            return render_template("denied.html", user=session.get("username"), reason="owner")
+        return view(*args, **kwargs)
+    return wrapped
+
+
+def true_owner_required(view):
+    """Para acciones que conceden poder a otras personas (añadir/quitar Staff,
+    dar/quitar acceso de moderador): SOLO el dueño real (OWNER_IDS), ni
+    siquiera Fundador/Co-Fundador/Administrador delegados. Evita que un
+    Staff delegado se auto-ascienda a Fundador o le dé acceso total a un
+    tercero sin que tú lo sepas."""
+    @functools.wraps(view)
+    def wrapped(*args, **kwargs):
+        if not _is_true_owner(session.get("user_id")):
             return render_template("denied.html", user=session.get("username"), reason="owner")
         return view(*args, **kwargs)
     return wrapped
@@ -173,6 +196,7 @@ def inject_globals():
     ]
     user_id = session.get("user_id")
     is_owner_now = _is_owner(user_id) if user_id else False
+    is_true_owner_now = _is_true_owner(user_id) if user_id else False
     is_panel_mod_now = is_owner_now or (bool(user_id) and db.is_panel_moderator(user_id))
     unread_dm_threads = db.count_unread_dm_threads() if is_panel_mod_now else 0
     return {
@@ -184,6 +208,7 @@ def inject_globals():
         "custom_css": custom.get("custom_css", ""),
         "custom_js": custom.get("custom_js", ""),
         "is_owner": is_owner_now,
+        "is_true_owner": is_true_owner_now,
         "is_panel_mod": is_panel_mod_now,
         "support_server_invite": config.SUPPORT_SERVER_INVITE,
         "staff_list": staff_list,
@@ -494,7 +519,7 @@ def global_premium_revoke():
 
 @app.route("/global/staff/add", methods=["POST"])
 @login_required
-@owner_required
+@true_owner_required
 def global_staff_add():
     user_id = request.form.get("user_id", "").strip()
     rank = request.form.get("rank", "").strip()
@@ -522,7 +547,7 @@ def global_staff_add():
 
 @app.route("/global/staff/remove", methods=["POST"])
 @login_required
-@owner_required
+@true_owner_required
 def global_staff_remove():
     user_id = request.form.get("user_id", "").strip()
     if not user_id or not user_id.isdigit():
@@ -535,7 +560,7 @@ def global_staff_remove():
 
 @app.route("/global/moderadores/add", methods=["POST"])
 @login_required
-@owner_required
+@true_owner_required
 def global_mod_add():
     user_id = request.form.get("user_id", "").strip()
     if not user_id or not user_id.isdigit():
@@ -559,7 +584,7 @@ def global_mod_add():
 
 @app.route("/global/moderadores/remove", methods=["POST"])
 @login_required
-@owner_required
+@true_owner_required
 def global_mod_remove():
     user_id = request.form.get("user_id", "").strip()
     if not user_id or not user_id.isdigit():
