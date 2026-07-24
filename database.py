@@ -58,10 +58,33 @@ CREATE TABLE IF NOT EXISTS backups (
     created_at INTEGER NOT NULL
 );
 
+-- Una única fila por servidor: la copia de seguridad automática siempre se
+-- sobreescribe a sí misma (nunca se acumulan varias), para que Anti-Nuke
+-- siempre tenga una foto reciente lista para autorestaurar sin ocupar espacio.
+CREATE TABLE IF NOT EXISTS auto_backups (
+    guild_id INTEGER PRIMARY KEY,
+    data TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS lockdown_state (
     guild_id INTEGER PRIMARY KEY,
     data TEXT NOT NULL,
     created_at INTEGER NOT NULL
+);
+
+-- Palabras prohibidas del Filtro de Palabras (Moderación de Chat).
+CREATE TABLE IF NOT EXISTS banned_words (
+    guild_id INTEGER NOT NULL,
+    word TEXT NOT NULL,
+    PRIMARY KEY (guild_id, word)
+);
+
+-- Última vez (epoch) que se envió el Reporte Semanal automático a un
+-- servidor, para no mandarlo dos veces el mismo día si el bot se reinicia.
+CREATE TABLE IF NOT EXISTS weekly_report_state (
+    guild_id INTEGER PRIMARY KEY,
+    last_sent_at INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS guild_blacklist (
@@ -338,6 +361,43 @@ async def antispam_whitelist_add(guild_id, user_id): await _wl_add("antispam_whi
 async def antispam_whitelist_remove(guild_id, user_id): await _wl_remove("antispam_whitelist", guild_id, user_id, "user_id")
 async def antispam_whitelist_has(guild_id, user_id): return await _wl_has("antispam_whitelist", guild_id, user_id, "user_id")
 
+
+# --- Filtro de Palabras (banned_words) ---
+async def banned_word_add(guild_id: int, word: str):
+    await conn().execute(
+        "INSERT OR IGNORE INTO banned_words (guild_id, word) VALUES (?, ?)", (guild_id, word.lower().strip())
+    )
+    await conn().commit()
+
+
+async def banned_word_remove(guild_id: int, word: str):
+    await conn().execute(
+        "DELETE FROM banned_words WHERE guild_id=? AND word=?", (guild_id, word.lower().strip())
+    )
+    await conn().commit()
+
+
+async def banned_word_list(guild_id: int) -> list[str]:
+    cur = await conn().execute("SELECT word FROM banned_words WHERE guild_id=?", (guild_id,))
+    rows = await cur.fetchall()
+    return [r[0] for r in rows]
+
+
+# --- Reporte semanal automático (Premium) ---
+async def get_last_weekly_report(guild_id: int) -> int | None:
+    cur = await conn().execute("SELECT last_sent_at FROM weekly_report_state WHERE guild_id=?", (guild_id,))
+    row = await cur.fetchone()
+    return row[0] if row else None
+
+
+async def set_last_weekly_report(guild_id: int, ts: int):
+    await conn().execute(
+        "INSERT INTO weekly_report_state (guild_id, last_sent_at) VALUES (?, ?) "
+        "ON CONFLICT(guild_id) DO UPDATE SET last_sent_at=excluded.last_sent_at",
+        (guild_id, ts),
+    )
+    await conn().commit()
+
 async def antiraid_whitelist_add(guild_id, user_id): await _wl_add("antiraid_whitelist", guild_id, user_id, "user_id")
 async def antiraid_whitelist_remove(guild_id, user_id): await _wl_remove("antiraid_whitelist", guild_id, user_id, "user_id")
 async def antiraid_whitelist_has(guild_id, user_id): return await _wl_has("antiraid_whitelist", guild_id, user_id, "user_id")
@@ -362,6 +422,21 @@ async def get_incidents(guild_id: int, limit: int = 15):
         (guild_id, limit),
     )
     return await cur.fetchall()
+
+
+async def incidents_summary_since(guild_id: int, since_ts: int):
+    """Usado por el Reporte Semanal: total de incidentes y desglose por módulo
+    desde `since_ts` (epoch) hasta ahora."""
+    cur = await conn().execute(
+        "SELECT COUNT(*) FROM incidents WHERE guild_id=? AND created_at>=?", (guild_id, since_ts)
+    )
+    total = (await cur.fetchone())[0]
+    cur = await conn().execute(
+        "SELECT module, COUNT(*) as c FROM incidents WHERE guild_id=? AND created_at>=? "
+        "GROUP BY module ORDER BY c DESC", (guild_id, since_ts)
+    )
+    by_module = await cur.fetchall()
+    return total, by_module
 
 
 async def clear_incidents(guild_id: int):
@@ -416,6 +491,29 @@ async def delete_backup(backup_id: int, guild_id: int) -> bool:
     cur = await conn().execute("DELETE FROM backups WHERE id=? AND guild_id=?", (backup_id, guild_id))
     await conn().commit()
     return cur.rowcount > 0
+
+
+# --- Copia de seguridad automática (autoheal de Anti-Nuke) ---
+# Siempre hay como mucho UNA fila por servidor: cada vez que se guarda una
+# nueva, sustituye a la anterior (no se van acumulando copias automáticas).
+async def save_auto_backup(guild_id: int, data: dict):
+    await conn().execute(
+        "INSERT INTO auto_backups (guild_id, data, created_at) VALUES (?, ?, ?) "
+        "ON CONFLICT(guild_id) DO UPDATE SET data=excluded.data, created_at=excluded.created_at",
+        (guild_id, json.dumps(data), int(time.time())),
+    )
+    await conn().commit()
+
+
+async def get_auto_backup(guild_id: int):
+    """Devuelve (data: dict, created_at: int) o None si todavía no hay ninguna."""
+    cur = await conn().execute(
+        "SELECT data, created_at FROM auto_backups WHERE guild_id=?", (guild_id,)
+    )
+    row = await cur.fetchone()
+    if not row:
+        return None
+    return json.loads(row[0]), row[1]
 
 
 # ---------------------------------------------------------------------------

@@ -51,6 +51,11 @@ _conn.executescript(
         id INTEGER PRIMARY KEY AUTOINCREMENT, guild_id INTEGER NOT NULL, label TEXT,
         data TEXT NOT NULL, created_at INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS auto_backups (
+        guild_id INTEGER PRIMARY KEY, data TEXT NOT NULL, created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS banned_words (guild_id INTEGER NOT NULL, word TEXT NOT NULL, PRIMARY KEY (guild_id, word));
+    CREATE TABLE IF NOT EXISTS weekly_report_state (guild_id INTEGER PRIMARY KEY, last_sent_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS guild_blacklist (guild_id INTEGER PRIMARY KEY, reason TEXT, added_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS user_blacklist (user_id INTEGER PRIMARY KEY, reason TEXT, added_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS reports (
@@ -316,6 +321,19 @@ def antiraid_whitelist_remove(g, u): _wl_remove("antiraid_whitelist", g, u, "use
 def antiraid_whitelist_list(g): return _wl_list("antiraid_whitelist", g, "user_id")
 
 
+# --- Filtro de Palabras ---
+def banned_word_add(guild_id: int, word: str):
+    _execute("INSERT OR IGNORE INTO banned_words (guild_id, word) VALUES (?, ?)", (guild_id, word.lower().strip()))
+
+
+def banned_word_remove(guild_id: int, word: str):
+    _execute("DELETE FROM banned_words WHERE guild_id=? AND word=?", (guild_id, word.lower().strip()))
+
+
+def banned_word_list(guild_id: int) -> list[str]:
+    return [r[0] for r in _fetchall("SELECT word FROM banned_words WHERE guild_id=? ORDER BY word", (guild_id,))]
+
+
 # --- Incidentes ("Sanciones") ---
 def get_incidents(guild_id: int, limit: int = 30):
     return _fetchall(
@@ -373,6 +391,16 @@ def delete_backup(backup_id: int, guild_id: int) -> bool:
 
 def backups_count(guild_id: int) -> int:
     return _fetchone("SELECT COUNT(*) FROM backups WHERE guild_id=?", (guild_id,))[0]
+
+
+# --- Copia de seguridad automática (autoheal de Anti-Nuke) — solo lectura
+# desde el panel, la escribe el bot cada hora y tras auto-restaurar. ---
+def get_auto_backup(guild_id: int):
+    """Devuelve (data: dict, created_at: int) o None si todavía no hay ninguna."""
+    row = _fetchone("SELECT data, created_at FROM auto_backups WHERE guild_id=?", (guild_id,))
+    if not row:
+        return None
+    return json.loads(row[0]), row[1]
 
 
 # --- Blacklists globales ---

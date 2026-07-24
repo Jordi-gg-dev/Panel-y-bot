@@ -22,7 +22,7 @@ from discord.ext import commands
 
 import config
 import database as db
-from utils import embeds, checks
+from utils import embeds, checks, alerts
 
 
 MODULE_CHOICES = [
@@ -143,18 +143,48 @@ class AntiNuke(commands.Cog):
 
         await db.log_incident(guild.id, module_key, executor.id, detail, action_taken)
 
+        autoheal_summary = None
+        if module_key in config.ANTINUKE_AUTOHEAL_MODULES and await db.get_bool(guild.id, "antinuke_autoheal", True):
+            autoheal_summary = await self._try_autoheal(guild, module_key)
+
+        alert_embed = embeds.alert(f"Anti-Nuke activado: {module_key}", detail)
+        alert_embed.add_field(name="Usuario", value=f"{executor.mention} (`{executor.id}`)", inline=False)
+        alert_embed.add_field(name="Veces detectadas", value=str(count), inline=True)
+        alert_embed.add_field(name="Acción tomada", value=action_taken, inline=True)
+        if autoheal_summary:
+            alert_embed.add_field(name="🤖 Auto-restauración", value=autoheal_summary, inline=False)
+
         log_channel_id = await db.get_config(guild.id, "antinuke_log_channel")
         if log_channel_id:
             channel = guild.get_channel(int(log_channel_id))
             if channel:
-                embed = embeds.alert(f"Anti-Nuke activado: {module_key}", detail)
-                embed.add_field(name="Usuario", value=f"{executor.mention} (`{executor.id}`)", inline=False)
-                embed.add_field(name="Veces detectadas", value=str(count), inline=True)
-                embed.add_field(name="Acción tomada", value=action_taken, inline=True)
                 try:
-                    await channel.send(content="@here" if False else None, embed=embed)
+                    await channel.send(embed=alert_embed)
                 except discord.HTTPException:
                     pass
+
+        # Alertas (Premium): además del canal de logs propio de arriba, avisa
+        # en el canal central de alertas y por MD al dueño si están activados.
+        await alerts.notify_realtime(guild, alert_embed)
+        await alerts.notify_owner_dm(guild, alert_embed)
+
+    async def _try_autoheal(self, guild: discord.Guild, module_key: str) -> str | None:
+        """Tras un borrado masivo de canales/roles, recrea lo que falte usando la
+        copia de seguridad automática (si existe). Nunca borra ni modifica nada,
+        solo rellena los huecos — es seguro llamarlo aunque el ataque siga."""
+        backup_cog = self.bot.get_cog("Backup")
+        if backup_cog is None:
+            return None
+        found, counts = await backup_cog.restore_from_auto(
+            guild, reason=f"Auto-restauración de AstroCube Anti-Raid tras {module_key}"
+        )
+        if not found:
+            return "No había ninguna copia automática todavía (se genera sola cada hora). Considera usar `/backup create` ahora."
+
+        created_roles, created_categories, created_channels = counts
+        summary = f"{created_roles} rol(es), {created_categories} categoría(s) y {created_channels} canal(es) recreados automáticamente."
+        await db.log_incident(guild.id, f"{module_key}_autoheal", None, "Auto-restauración tras Anti-Nuke", summary)
+        return summary
 
     # ------------------------------------------------------------------
     # Eventos vigilados
@@ -198,11 +228,13 @@ class AntiNuke(commands.Cog):
     @checks.is_admin()
     async def antinuke_status(self, interaction: discord.Interaction):
         enabled = await db.get_bool(interaction.guild.id, "antinuke_enabled", True)
+        autoheal = await db.get_bool(interaction.guild.id, "antinuke_autoheal", True)
         punishment = await db.get_config(interaction.guild.id, "antinuke_punishment", "strip-roles")
         log_channel_id = await db.get_config(interaction.guild.id, "antinuke_log_channel")
         whitelist = await db.antinuke_whitelist_list(interaction.guild.id)
         embed = embeds.info("🛡️ Estado del Anti-Nuke")
         embed.add_field(name="Activo", value="Sí ✅" if enabled else "No ❌", inline=True)
+        embed.add_field(name="Auto-restauración", value="Sí ✅" if autoheal else "No ❌", inline=True)
         embed.add_field(name="Castigo", value=punishment, inline=True)
         embed.add_field(name="Canal de logs", value=f"<#{log_channel_id}>" if log_channel_id else "No configurado", inline=True)
         embed.add_field(name="Whitelist", value=str(len(whitelist)) + " usuario(s)", inline=True)
@@ -210,6 +242,19 @@ class AntiNuke(commands.Cog):
             count, seconds = await db.get_int_pair(interaction.guild.id, f"antinuke_threshold_{key}", (default_c, default_s))
             embed.add_field(name=key, value=f"{count} en {seconds}s", inline=True)
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    @antinuke_group.command(name="autoheal", description="Activa o desactiva la auto-restauración de canales/roles tras un ataque")
+    @checks.is_admin()
+    async def antinuke_autoheal(self, interaction: discord.Interaction):
+        current = await db.get_bool(interaction.guild.id, "antinuke_autoheal", True)
+        await db.set_config(interaction.guild.id, "antinuke_autoheal", "0" if current else "1")
+        estado = "desactivada ❌" if current else "activada ✅"
+        await interaction.response.send_message(embed=embeds.success(
+            f"Auto-restauración {estado}",
+            "Cuando alguien borre canales/roles en masa, Anti-Nuke ya no recreará automáticamente lo borrado usando la copia de seguridad automática."
+            if current else
+            "Cuando alguien borre canales/roles en masa, además de castigarlo Anti-Nuke recreará automáticamente lo borrado usando la copia de seguridad automática (`/backup auto-status` para verla).",
+        ))
 
     @antinuke_group.command(name="punishment", description="Define el castigo automático del anti-nuke")
     @app_commands.choices(castigo=PUNISHMENT_CHOICES)

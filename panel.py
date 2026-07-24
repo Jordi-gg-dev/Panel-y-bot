@@ -43,6 +43,7 @@ CHANNEL_TYPE_CATEGORY = 4
 
 TABS = [
     ("resumen", "Resumen", "grid"),
+    ("seguridad", "Seguridad", "shield"),
     ("reportes", "Reportes", "flag"),
     ("staff", "Staff", "users"),
     ("bot", "CTO", "crown"),
@@ -773,6 +774,29 @@ def guild_detail(guild_id):
             backups_count=db.backups_count(guild_id), **ctx,
         )
 
+    if tab == "seguridad":
+        seg = {
+            "antiraid_enabled": db.get_bool(guild_id, "antiraid_enabled", True),
+            "antibots_enabled": db.get_bool(guild_id, "antibots_enabled", True),
+            "antinuke_enabled": db.get_bool(guild_id, "antinuke_enabled", True),
+            "antispam_enabled": db.get_bool(guild_id, "antispam_enabled", True),
+            "filtro_palabras_enabled": db.get_bool(guild_id, "filtro_palabras_enabled", True),
+            "antighostping_enabled": db.get_bool(guild_id, "antighostping_enabled", True),
+            "automod_base_enabled": db.get_bool(guild_id, "automod_base_enabled", True),
+            "antilinks_enabled": db.get_bool(guild_id, "antilinks_enabled", False),
+            "antitokens_enabled": db.get_bool(guild_id, "antitokens_enabled", True),
+            "antimalware_enabled": db.get_bool(guild_id, "antimalware_enabled", True),
+            "antiwebhook_enabled": db.get_bool(guild_id, "antiwebhook_enabled", True),
+            "alerts_realtime_enabled": db.get_bool(guild_id, "alerts_realtime_enabled", False),
+            "alerts_dm_enabled": db.get_bool(guild_id, "alerts_dm_enabled", False),
+            "alerts_weekly_enabled": db.get_bool(guild_id, "alerts_weekly_enabled", False),
+            "alerts_channel": db.get_config(guild_id, "alerts_channel"),
+        }
+        return render_template(
+            "guild_seguridad.html", tab=tab, guild_id=guild_id, counts=counts,
+            seg=seg, is_premium=db.is_premium(guild_id), **ctx,
+        )
+
     if tab == "reportes":
         status_filter = request.args.get("status", "open")
         search = request.args.get("q", "").strip()
@@ -1496,6 +1520,42 @@ def guild_config_save(guild_id):
 
     flash("Configuración guardada.", "success")
     return redirect(url_for("guild_detail", guild_id=guild_id, tab="config"))
+
+
+# ---------------------------------------------------------------------------
+# Seguridad (vista rápida de interruptores — Protección / Moderación de Chat /
+# AutoMod Avanzado / Alertas). Los ajustes finos de cada módulo (umbrales,
+# whitelists, dominios permitidos...) se hacen con los comandos /antinuke,
+# /antiraid, /antispam, /automod, /filtro-palabras y /alertas del propio bot.
+# ---------------------------------------------------------------------------
+SEGURIDAD_TOGGLE_KEYS = [
+    "antiraid_enabled", "antibots_enabled", "antinuke_enabled",
+    "antispam_enabled", "filtro_palabras_enabled", "antighostping_enabled",
+    "automod_base_enabled", "antilinks_enabled", "antitokens_enabled",
+    "antimalware_enabled", "antiwebhook_enabled",
+]
+SEGURIDAD_PREMIUM_TOGGLE_KEYS = [
+    "alerts_realtime_enabled", "alerts_dm_enabled", "alerts_weekly_enabled",
+]
+
+
+@app.route("/guild/<int:guild_id>/seguridad", methods=["POST"])
+@login_required
+@guild_access_required
+def guild_seguridad_save(guild_id):
+    f = request.form
+
+    for key in SEGURIDAD_TOGGLE_KEYS:
+        db.set_config(guild_id, key, "1" if f.get(key) else "0")
+
+    if db.is_premium(guild_id):
+        for key in SEGURIDAD_PREMIUM_TOGGLE_KEYS:
+            db.set_config(guild_id, key, "1" if f.get(key) else "0")
+        if f.get("alerts_channel"):
+            db.set_config(guild_id, "alerts_channel", f.get("alerts_channel"))
+
+    flash("Ajustes de seguridad guardados.", "success")
+    return redirect(url_for("guild_detail", guild_id=guild_id, tab="seguridad"))
 
 
 # ---------------------------------------------------------------------------

@@ -73,3 +73,32 @@ DEFAULT_ANTIRAID_JOIN_THRESHOLD = (10, 15)    # 10 entradas en 15 segundos
 # Si algún servidor quiere expulsar cuentas nuevas igualmente, puede activarlo
 # con /antiraid minaccountage <dias>.
 DEFAULT_MIN_ACCOUNT_AGE_DAYS = 0
+
+# Cada cuántas horas se refresca en segundo plano la copia de seguridad
+# automática de cada servidor (solo se guarda 1, se sobreescribe sola).
+DEFAULT_AUTOBACKUP_INTERVAL_HOURS = 1
+
+# Qué tipos de incidente de Anti-Nuke disparan la auto-restauración desde esa
+# copia automática (borrado masivo de canales/roles: es lo único que un
+# backup de canales/roles puede arreglar solo).
+ANTINUKE_AUTOHEAL_MODULES = {"channel_delete", "role_delete"}
+
+# --- Módulos de AutoMod / Moderación de Chat (cogs/automod.py) ---
+# Extensiones de archivo que Anti-Malware bloquea por defecto (ejecutables y
+# scripts, lo más habitual en adjuntos maliciosos por Discord).
+DEFAULT_DANGEROUS_EXTENSIONS = {
+    ".exe", ".bat", ".cmd", ".com", ".scr", ".msi", ".msp", ".vbs", ".vbe",
+    ".js", ".jse", ".ps1", ".ps2", ".jar", ".gadget", ".application", ".lnk",
+    ".reg", ".hta", ".cpl", ".dll", ".sh",
+}
+
+# Patrón para detectar tokens de Discord filtrados en un mensaje (formato
+# estándar de token de bot/usuario: 3 segmentos separados por puntos).
+ANTITOKEN_REGEX = r"[MNO][a-zA-Z\d_-]{23,25}\.[a-zA-Z\d_-]{6}\.[a-zA-Z\d_-]{27,38}"
+
+DEFAULT_ANTIWEBHOOK_MESSAGE_THRESHOLD = (5, 10)  # 5 mensajes de un mismo webhook en 10s
+
+# --- Alertas (Premium): centralizan los avisos de todos los módulos en un
+# único canal, además de (opcionalmente) avisar por MD al dueño del servidor
+# y mandar un resumen semanal automático. Ver utils/alerts.py. ---
+WEEKLY_REPORT_WEEKDAY = 0  # 0 = lunes

@@ -20,7 +20,7 @@ from discord.ext import commands
 
 import config
 import database as db
-from utils import embeds, checks
+from utils import embeds, checks, alerts
 
 
 ACTION_CHOICES = [
@@ -42,21 +42,26 @@ class AntiRaid(commands.Cog):
         self._joins: dict[int, list[float]] = defaultdict(list)
 
     async def _notify(self, guild: discord.Guild, title: str, description: str):
+        embed = embeds.alert(title, description)
         channel_id = await db.get_config(guild.id, "antiraid_log_channel") or await db.get_config(guild.id, "antinuke_log_channel")
-        if not channel_id:
-            return
-        channel = guild.get_channel(int(channel_id))
-        if channel:
-            try:
-                await channel.send(embed=embeds.alert(title, description))
-            except discord.HTTPException:
-                pass
+        if channel_id:
+            channel = guild.get_channel(int(channel_id))
+            if channel:
+                try:
+                    await channel.send(embed=embed)
+                except discord.HTTPException:
+                    pass
+        # Alertas (Premium): oleada de entradas es exactamente el tipo de
+        # "emergencia" que justifica el aviso central + MD al dueño.
+        await alerts.notify_realtime(guild, embed)
+        await alerts.notify_owner_dm(guild, embed)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        if member.bot:
-            return
         guild = member.guild
+        if member.bot:
+            await self._check_antibots(member)
+            return
         if not await db.get_bool(guild.id, "antiraid_enabled", True):
             return
         if await db.antiraid_whitelist_has(guild.id, member.id):
@@ -85,6 +90,38 @@ class AntiRaid(commands.Cog):
         if len(history) >= count_threshold:
             self._joins[guild.id] = []
             await self._trigger_raid_mode(guild, len(history), window)
+
+    async def _check_antibots(self, member: discord.Member):
+        """Anti-Bots: si un bot se une y no está en la lista de bots de
+        confianza (la misma whitelist que usa Anti-Nuke con /antinuke
+        trustedbot-add), se expulsa al instante. Así cualquier bot añadido
+        por sorpresa (por ejemplo con un token robado con permiso de
+        invitar bots) no llega a hacer nada."""
+        guild = member.guild
+        if member.id == self.bot.user.id:
+            return
+        if not await db.get_bool(guild.id, "antibots_enabled", True):
+            return
+        if await db.antinuke_trustedbot_has(guild.id, member.id):
+            return
+        try:
+            await member.kick(reason="AstroCube Anti-Raid (Anti-Bots): bot no autorizado")
+            await db.log_incident(guild.id, "unauthorized_bot", member.id, f"Bot no autorizado: {member}", "bot expulsado automáticamente")
+            await self._notify(guild, "🤖 Bot no autorizado expulsado", f"{member} (`{member.id}`) no estaba en la lista de bots de confianza.\nSi era legítimo, autorízalo con `/antinuke trustedbot-add` antes de volver a invitarlo.")
+        except discord.HTTPException:
+            pass
+
+    @app_commands.command(name="antibots", description="Activa/desactiva la expulsión automática de bots no autorizados al entrar")
+    @checks.is_admin()
+    async def antibots_toggle(self, interaction: discord.Interaction):
+        current = await db.get_bool(interaction.guild.id, "antibots_enabled", True)
+        await db.set_config(interaction.guild.id, "antibots_enabled", "0" if current else "1")
+        estado = "desactivado ❌" if current else "activado ✅"
+        await interaction.response.send_message(embed=embeds.success(
+            f"Anti-Bots {estado}",
+            "Los bots que autorices con `/antinuke trustedbot-add` seguirán pudiendo entrar sin problema."
+            if not current else None,
+        ))
 
     async def _trigger_raid_mode(self, guild: discord.Guild, count: int, window: int):
         action = await db.get_config(guild.id, "antiraid_action", "lockdown-verification")
