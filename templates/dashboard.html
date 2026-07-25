@@ -100,7 +100,7 @@
       <div class="flex items-center gap-4 text-xs mb-3 flex-wrap">
         <div>
           <span class="text-slate-500">Reportes:</span>
-          <span class="font-bold {% if stats.open_reports %}text-orange-400{% else %}text-slate-300{% endif %}">{{ stats.open_reports or 0 }}</span>
+          <span class="font-bold {% if stats.open_reports %}text-indigo-400{% else %}text-slate-300{% endif %}">{{ stats.open_reports or 0 }}</span>
         </div>
         <div>
           <span class="text-slate-500">Incidentes 24h:</span>
@@ -112,7 +112,7 @@
         </div>
         <div>
           <span class="text-slate-500">Tickets:</span>
-          <span class="font-bold {% if stats.open_tickets %}text-orange-400{% else %}text-slate-300{% endif %}">{{ stats.open_tickets or 0 }}</span>
+          <span class="font-bold {% if stats.open_tickets %}text-indigo-400{% else %}text-slate-300{% endif %}">{{ stats.open_tickets or 0 }}</span>
         </div>
       </div>
     </a>

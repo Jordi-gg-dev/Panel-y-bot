@@ -6,20 +6,20 @@
 --------------------------------------------------------------------------- */
 
 :root {
-  --bg: #0a0a0c;
-  --surface: #131316;
-  --surface-2: #19191d;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --bg: #05070c;
+  --surface: #10131c;
+  --surface-2: #161a26;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.15);
 
-  --text-primary: #f4f4f5;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  --text-primary: #f4f5f7;
+  --text-secondary: #98a1b3;
+  --text-muted: #6b7387;
 
-  --accent: #f0703a;
-  --accent-hover: #e35f28;
-  --accent-soft: rgba(240, 112, 58, 0.12);
-  --accent-soft-border: rgba(240, 112, 58, 0.25);
+  --accent: #6d7bff;
+  --accent-hover: #5763e6;
+  --accent-soft: rgba(109, 123, 255, 0.14);
+  --accent-soft-border: rgba(109, 123, 255, 0.28);
 
   --success: #22c55e;
   --success-soft: rgba(34, 197, 94, 0.12);
@@ -27,6 +27,16 @@
   --danger-soft: rgba(240, 68, 56, 0.12);
   --warning: #eab308;
   --warning-soft: rgba(234, 179, 8, 0.12);
+
+  /* Colores de categoria: cada seccion del panel (sidebar) tiene su propio
+     tono, en vez de forzar un unico color de marca en todas partes. */
+  --cat-blue: #5b9dff;
+  --cat-cyan: #22d3ee;
+  --cat-emerald: #34d399;
+  --cat-amber: #fbbf24;
+  --cat-rose: #fb7185;
+  --cat-violet: #a78bfa;
+  --cat-pink: #f472b6;
 
   --radius-lg: 12px;
   --radius: 10px;
@@ -38,7 +48,9 @@
 
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 26px 26px;
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
 }
@@ -81,8 +93,22 @@ body {
   color: var(--text-primary);
 }
 
+/* Etiqueta de grupo en la barra lateral (GENERAL / SEGURIDAD / ...),
+   igual que las secciones en mayúsculas de paneles tipo Oryon/MapleMC. */
+.nav-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.85rem 0.75rem 0.3rem;
+}
+.nav-section-label:first-child { padding-top: 0.3rem; }
+
 /* Item de navegación de la barra lateral: acento como barra izquierda
-   plana + fondo tenue, en vez del "chip" con gradiente de antes. */
+   plana + fondo tenue, en vez del "chip" con gradiente de antes. Cada
+   sección puede traer su propio color via --tab-color (icono + estado
+   activo), en vez de forzar un único color de marca en todo el sidebar. */
 .nav-item {
   position: relative;
   display: flex;
@@ -96,18 +122,23 @@ body {
   color: var(--text-secondary);
   margin-bottom: 2px;
   border-left: 2px solid transparent;
+  --tab-color: var(--accent);
 }
+
+.nav-item .nav-icon { color: var(--tab-color); opacity: 0.85; transition: opacity 0.12s ease; }
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.035);
   color: var(--text-primary);
 }
+.nav-item:hover .nav-icon { opacity: 1; }
 
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.045);
+  background: color-mix(in srgb, var(--tab-color) 14%, transparent);
   color: var(--text-primary);
-  border-left-color: var(--accent);
+  border-left-color: var(--tab-color);
 }
+.nav-item.active .nav-icon { opacity: 1; }
 
 .nav-badge {
   font-size: 10px;
@@ -246,7 +277,7 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
   transition: 0.15s;
 }
 .toggle input:checked + .slider {
-  background: var(--accent);
+  background: var(--toggle-accent, var(--accent));
 }
 .toggle input:checked + .slider::before {
   transform: translateX(18px);

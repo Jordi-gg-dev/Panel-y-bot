@@ -41,25 +41,33 @@ FREE_INCIDENT_RETENTION_DAYS = 7
 CHANNEL_TYPE_VOICE = 2
 CHANNEL_TYPE_CATEGORY = 4
 
+
+# Cada pestaña: (key, etiqueta, icono, color de categoria, grupo del sidebar).
+# El grupo se usa para mostrar una etiqueta de sección (GENERAL/SEGURIDAD/...)
+# la primera vez que aparece; por eso el orden de la lista SI importa (las
+# pestañas de un mismo grupo deben ir seguidas).
 TABS = [
-    ("resumen", "Resumen", "grid"),
-    ("seguridad", "Seguridad", "shield"),
-    ("reportes", "Reportes", "flag"),
-    ("staff", "Staff", "users"),
-    ("bot", "CTO", "crown"),
-    ("tareas", "Tareas", "clipboard-check"),
-    ("sanciones", "Sanciones", "scale"),
-    ("mensajes", "Mensajes", "message-square"),
-    ("analiticas", "Analíticas", "bar-chart"),
-    ("config", "Configuración", "settings"),
-    ("backups", "Backups", "file-text"),
-    ("premium", "Premium", "diamond"),
-    ("comandos", "Comandos", "code"),
-    ("perfil", "Perfil de Bot", "user-circle"),
-    ("niveles", "Niveles", "bar-chart"),
-    ("sorteos", "Sorteos", "activity"),
-    ("tickets", "Tickets", "message-square"),
-    ("roles-reaccion", "Roles Reacción", "users"),
+    ("resumen", "Resumen", "grid", "var(--cat-blue)", "General"),
+
+    ("seguridad", "Seguridad", "shield", "var(--cat-blue)", "Seguridad"),
+    ("sanciones", "Sanciones", "scale", "var(--cat-rose)", "Seguridad"),
+    ("reportes", "Reportes", "flag", "var(--cat-amber)", "Seguridad"),
+
+    ("staff", "Staff", "users", "var(--cat-emerald)", "Comunidad"),
+    ("niveles", "Niveles", "bar-chart", "var(--cat-emerald)", "Comunidad"),
+    ("sorteos", "Sorteos", "activity", "var(--cat-amber)", "Comunidad"),
+    ("tickets", "Tickets", "message-square", "var(--cat-cyan)", "Comunidad"),
+    ("roles-reaccion", "Roles Reacción", "users", "var(--cat-emerald)", "Comunidad"),
+    ("mensajes", "Mensajes", "message-square", "var(--cat-cyan)", "Comunidad"),
+    ("tareas", "Tareas", "clipboard-check", "var(--cat-violet)", "Comunidad"),
+
+    ("bot", "CTO", "crown", "var(--cat-violet)", "Gestión del bot"),
+    ("analiticas", "Analíticas", "bar-chart", "var(--cat-violet)", "Gestión del bot"),
+    ("comandos", "Comandos", "code", "var(--cat-cyan)", "Gestión del bot"),
+    ("perfil", "Perfil de Bot", "user-circle", "var(--cat-violet)", "Gestión del bot"),
+    ("backups", "Backups", "file-text", "var(--cat-violet)", "Gestión del bot"),
+    ("premium", "Premium", "diamond", "var(--cat-pink)", "Gestión del bot"),
+    ("config", "Configuración", "settings", "var(--cat-violet)", "Gestión del bot"),
 ]
 
 # Rangos disponibles para el equipo de Staff mostrado en el botón "Staff"
@@ -182,7 +190,7 @@ def _administrable_guilds_for(user_id: int, all_guilds: list[dict]) -> list[dict
 
 
 def _tab_label(key: str) -> str:
-    for k, label, icon in TABS:
+    for k, label, icon, color, group in TABS:
         if k == key:
             return label
     return key.capitalize()

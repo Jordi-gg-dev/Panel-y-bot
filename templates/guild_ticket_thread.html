@@ -19,7 +19,7 @@
   <div class="space-y-3 max-h-[55vh] overflow-y-auto" id="ticket-scroll">
     {% for e in entries %}
     <div class="flex {{ 'justify-end' if e.direction == 'out' else 'justify-start' }}">
-      <div class="max-w-[75%] rounded-xl px-3 py-2 {{ 'bg-orange-600/20 border border-orange-600/30' if e.direction == 'out' else 'bg-black/30 border border-white/5' }}">
+      <div class="max-w-[75%] rounded-xl px-3 py-2 {{ 'bg-indigo-600/20 border border-indigo-600/30' if e.direction == 'out' else 'bg-black/30 border border-white/5' }}">
         <div class="text-xs text-slate-400 mb-0.5">{{ e.username or ('Staff' if e.direction == 'out' else 'Usuario') }}</div>
         <div class="text-sm text-slate-100 whitespace-pre-wrap break-words">{{ e.content }}</div>
         <div class="text-[10px] text-slate-500 mt-1 epoch-cell" data-ts="{{ e.created_at }}">—</div>

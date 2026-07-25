@@ -67,7 +67,7 @@
         <td class="px-4 py-2.5 flex items-center gap-2">
           {% if avatar_url %}<img src="{{ avatar_url }}" class="w-6 h-6 rounded-full">{% endif %}
           <span class="text-slate-200 font-semibold">{{ username or "—" }}</span>
-          {% if user_id in owner_ids_for_badge %}<span class="text-[9px] font-bold text-orange-400 uppercase">Propietario</span>{% endif %}
+          {% if user_id in owner_ids_for_badge %}<span class="text-[9px] font-bold text-indigo-400 uppercase">Propietario</span>{% endif %}
         </td>
         <td class="px-4 py-2.5"><code class="text-xs text-slate-400">{{ user_id }}</code></td>
         <td class="px-4 py-2.5 text-slate-400 epoch-cell" data-ts="{{ created_at }}">—</td>
