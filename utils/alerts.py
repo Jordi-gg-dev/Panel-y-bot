@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Alertas centralizadas (Premium).
+Nebula Security Anti-Raid - Alertas centralizadas (Premium).
 
 Tres funciones independientes que cualquier módulo (Anti-Nuke, Anti-Raid,
 Anti-Spam, AutoMod...) puede llamar tras detectar y castigar algo:

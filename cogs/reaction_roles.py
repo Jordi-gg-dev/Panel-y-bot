@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Roles de reaccion/boton.
+Nebula Security Anti-Raid - Roles de reaccion/boton.
 
 Los paneles (mensaje + botones) se crean desde el panel web (que los publica
 via API REST). Este cog solo se encarga de RESPONDER a los clics: da o quita

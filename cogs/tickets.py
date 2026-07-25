@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Sistema de Tickets.
+Nebula Security Anti-Raid - Sistema de Tickets.
 
 /ticket-panel (staff) publica un mensaje con DOS botones, uno por idioma
 (Español / English). Quien pulsa uno crea su ticket en ese idioma: todos los

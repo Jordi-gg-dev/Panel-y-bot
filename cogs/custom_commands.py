@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Comandos personalizados (funcion Premium).
+Nebula Security Anti-Raid - Comandos personalizados (funcion Premium).
 
 Los servidores con suscripcion Premium activa pueden crear "comandos"
 tipo trigger -> respuesta desde el panel web. Este cog escucha los mensajes

@@ -1,5 +1,5 @@
 """
-AstroCube - Sistema de idiomas (ES/EN).
+Nebula Security - Sistema de idiomas (ES/EN).
 
 Modulo compartido por el bot (cogs/*.py, main.py) Y el panel web (panel.py,
 plantillas), sin depender de discord.py ni de Flask, para poder importarlo

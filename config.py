@@ -1,7 +1,7 @@
 """
-AstroCube Anti-Raid - Configuración central del bot.
+Nebula Security Anti-Raid - Configuración central del bot.
 
-A diferencia de AstroCube Security (pensado para un único servidor), este bot
+A diferencia del bot para un único servidor, este bot
 está diseñado para funcionar en MUCHOS servidores a la vez. Por eso los
 permisos no dependen de una lista fija de roles de staff: cada servidor usa
 sus propios administradores (permiso nativo "Administrador" de Discord).
@@ -32,10 +32,10 @@ DEV_GUILD_ID: int | None = int(os.getenv("DEV_GUILD_ID")) if os.getenv("DEV_GUIL
 # pueden usar /owner (reload, sync, guildlist, leaveguild, blacklist, broadcast).
 OWNER_IDS: list[int] = _parse_id_list(os.getenv("OWNER_IDS", ""))
 
-BOT_NAME = "AstroCube Anti-Raid"
+BOT_NAME = "Nebula Security Anti-Raid"
 BRAND_ICON_URL = os.getenv("BRAND_ICON_URL", "")
 
-# Servidor de soporte/comunidad de AstroCube (equivalente al botón "Únete a mi
+# Servidor de soporte/comunidad de Nebula Security (equivalente al botón "Únete a mi
 # Servidor" de otros paneles). Se puede sobreescribir desde el .env.
 SUPPORT_SERVER_INVITE = os.getenv("SUPPORT_SERVER_INVITE", "https://discord.gg/jRdnjBqVK")
 

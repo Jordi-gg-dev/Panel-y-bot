@@ -1,6 +1,6 @@
 """
 stripe_client.py - Integracion con Stripe para las suscripciones Premium de
-AstroCube Anti-Raid (una suscripcion por servidor de Discord).
+Nebula Security Anti-Raid (una suscripcion por servidor de Discord).
 
 IMPORTANTE: este modulo solo construye las llamadas a la API de Stripe con
 tus propias claves (.env). Quien gestiona el dinero real es Stripe y tu

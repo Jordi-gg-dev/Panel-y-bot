@@ -1,8 +1,8 @@
 """
-AstroCube Anti-Raid - Control de permisos.
+Nebula Security Anti-Raid - Control de permisos.
 
-Este bot vive en muchos servidores distintos, así que (a diferencia de
-AstroCube Security) NO usa una lista fija de roles de staff: cada servidor
+Este bot vive en muchos servidores distintos, así que (a diferencia del bot
+para un único servidor) NO usa una lista fija de roles de staff: cada servidor
 usa su propio permiso nativo de Discord ("Administrador" o "Gestionar
 servidor"). Los comandos /owner están reservados a los desarrolladores del
 bot (config.OWNER_IDS), no a cada servidor.
@@ -72,6 +72,6 @@ def is_bot_owner():
     async def predicate(interaction: discord.Interaction) -> bool:
         if await is_owner(interaction.user.id):
             return True
-        raise NotOwner("Este comando solo puede usarlo el equipo desarrollador de AstroCube Anti-Raid.")
+        raise NotOwner("Este comando solo puede usarlo el equipo desarrollador de Nebula Security Anti-Raid.")
 
     return app_commands.check(predicate)

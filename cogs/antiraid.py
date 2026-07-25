@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Módulo Anti-Raid (oleadas de entrada).
+Nebula Security Anti-Raid - Módulo Anti-Raid (oleadas de entrada).
 
 Dos protecciones independientes:
 1. Filtro de cuentas nuevas: expulsa automáticamente cuentas más jóvenes que
@@ -30,7 +30,7 @@ ACTION_CHOICES = [
 
 
 class AntiRaid(commands.Cog):
-    """Protección anti-raid (oleadas de entrada) de AstroCube Anti-Raid."""
+    """Protección anti-raid (oleadas de entrada) de Nebula Security Anti-Raid."""
 
     antiraid_group = app_commands.Group(
         name="antiraid", description="Protección contra oleadas de entrada y cuentas nuevas",
@@ -72,7 +72,7 @@ class AntiRaid(commands.Cog):
 
         if min_age > 0 and account_age_days < min_age:
             try:
-                await member.kick(reason=f"AstroCube Anti-Raid: cuenta de {account_age_days} días (mínimo {min_age})")
+                await member.kick(reason=f"Nebula Security Anti-Raid: cuenta de {account_age_days} días (mínimo {min_age})")
                 await db.log_incident(guild.id, "new_account", member.id, f"Cuenta de {account_age_days} días (mínimo {min_age})", "expulsado automáticamente")
                 await self._notify(guild, "Cuenta nueva expulsada", f"{member} (`{member.id}`) — cuenta de {account_age_days} días.")
             except discord.HTTPException:
@@ -105,7 +105,7 @@ class AntiRaid(commands.Cog):
         if await db.antinuke_trustedbot_has(guild.id, member.id):
             return
         try:
-            await member.kick(reason="AstroCube Anti-Raid (Anti-Bots): bot no autorizado")
+            await member.kick(reason="Nebula Security Anti-Raid (Anti-Bots): bot no autorizado")
             await db.log_incident(guild.id, "unauthorized_bot", member.id, f"Bot no autorizado: {member}", "bot expulsado automáticamente")
             await self._notify(guild, "🤖 Bot no autorizado expulsado", f"{member} (`{member.id}`) no estaba en la lista de bots de confianza.\nSi era legítimo, autorízalo con `/antinuke trustedbot-add` antes de volver a invitarlo.")
         except discord.HTTPException:
@@ -129,7 +129,7 @@ class AntiRaid(commands.Cog):
         action_taken = "ninguna"
 
         try:
-            await guild.edit(verification_level=discord.VerificationLevel.highest, reason="AstroCube Anti-Raid: oleada de entradas detectada")
+            await guild.edit(verification_level=discord.VerificationLevel.highest, reason="Nebula Security Anti-Raid: oleada de entradas detectada")
             action_taken = "nivel de verificación subido al máximo"
         except discord.HTTPException as exc:
             action_taken = f"error al subir verificación ({exc})"

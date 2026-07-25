@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Sorteos (giveaways).
+Nebula Security Anti-Raid - Sorteos (giveaways).
 
 /sorteo crear -> publica un embed con un boton "Participar" (persistente).
 Cada minuto se revisa si algun sorteo ha terminado y, si es asi, se sortea
@@ -64,7 +64,7 @@ class GiveawayJoinView(discord.ui.View):
 
 
 class Sorteos(commands.Cog):
-    """Sorteos (giveaways) de AstroCube Anti-Raid."""
+    """Sorteos (giveaways) de Nebula Security Anti-Raid."""
 
     sorteo_group = app_commands.Group(
         name="sorteo", description="Crear y gestionar sorteos",

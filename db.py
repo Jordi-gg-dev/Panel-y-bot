@@ -1,5 +1,5 @@
 """
-AstroCube Panel - Acceso a la MISMA base de datos SQLite que usa el bot
+Nebula Security Panel - Acceso a la MISMA base de datos SQLite que usa el bot
 (data/antiraid.db). El panel escribe ahí y el bot lo lee al instante en su
 siguiente evento/comando - no hace falta que el bot este corriendo para usar
 el panel.

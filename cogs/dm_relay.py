@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Mensajes privados (modmail).
+Nebula Security Anti-Raid - Mensajes privados (modmail).
 
 Cuando alguien le escribe un mensaje directo (DM) al bot, se guarda en la
 base de datos compartida con el panel web para que el propietario (o

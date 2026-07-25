@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Comandos de moderación básica para responder a un
+Nebula Security Anti-Raid - Comandos de moderación básica para responder a un
 ataque en curso (banear/expulsar raiders, purgar spam, poner en cuarentena).
 """
 
@@ -29,7 +29,7 @@ def parse_duration(text: str) -> datetime.timedelta | None:
 
 
 class Moderation(commands.Cog):
-    """Moderación básica de AstroCube Anti-Raid."""
+    """Moderación básica de Nebula Security Anti-Raid."""
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot

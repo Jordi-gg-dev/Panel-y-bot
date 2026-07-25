@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Módulo Anti-Spam.
+Nebula Security Anti-Raid - Módulo Anti-Spam.
 
 Detecta ráfagas de mensajes y spam de menciones (mass-mention) por usuario,
 borra los mensajes y aplica un castigo configurable.
@@ -28,7 +28,7 @@ PUNISHMENT_CHOICES = [
 
 
 class AntiSpam(commands.Cog):
-    """Protección anti-spam de AstroCube Anti-Raid."""
+    """Protección anti-spam de Nebula Security Anti-Raid."""
 
     antispam_group = app_commands.Group(
         name="antispam", description="Protección contra flood de mensajes y spam de menciones",
@@ -74,7 +74,7 @@ class AntiSpam(commands.Cog):
             except discord.HTTPException:
                 pass
             punishment = await db.get_config(guild_id, "antispam_punishment", "timeout")
-            action = await self._punish(message.author, "AstroCube Anti-Raid: spam de menciones", punishment)
+            action = await self._punish(message.author, "Nebula Security Anti-Raid: spam de menciones", punishment)
             await db.log_incident(guild_id, "mention_spam", message.author.id, f"{total_mentions} menciones en un mensaje", action)
             return
 
@@ -91,7 +91,7 @@ class AntiSpam(commands.Cog):
         if len(recent) >= count_threshold:
             self._message_log[key] = []
             punishment = await db.get_config(guild_id, "antispam_punishment", "timeout")
-            action = await self._punish(message.author, "AstroCube Anti-Raid: flood de mensajes", punishment)
+            action = await self._punish(message.author, "Nebula Security Anti-Raid: flood de mensajes", punishment)
             for _, msg in recent:
                 try:
                     await msg.delete()

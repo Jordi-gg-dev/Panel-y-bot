@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Módulo Anti-Nuke.
+Nebula Security Anti-Raid - Módulo Anti-Nuke.
 
 Vigila acciones destructivas masivas (borrado/creación de canales y roles,
 baneos, webhooks) usando el registro de auditoría del servidor para
@@ -61,7 +61,7 @@ class ActionTracker:
 
 
 class AntiNuke(commands.Cog):
-    """Protección anti-nuke de AstroCube Anti-Raid."""
+    """Protección anti-nuke de Nebula Security Anti-Raid."""
 
     antinuke_group = app_commands.Group(
         name="antinuke", description="Protección contra borrado/creación masiva y baneos (nuke)",
@@ -125,18 +125,18 @@ class AntiNuke(commands.Cog):
         try:
             if member:
                 if punishment == "ban":
-                    await guild.ban(member, reason=f"AstroCube Anti-Raid: {detail}", delete_message_seconds=0)
+                    await guild.ban(member, reason=f"Nebula Security Anti-Raid: {detail}", delete_message_seconds=0)
                     action_taken = "usuario baneado"
                 elif punishment == "kick":
-                    await guild.kick(member, reason=f"AstroCube Anti-Raid: {detail}")
+                    await guild.kick(member, reason=f"Nebula Security Anti-Raid: {detail}")
                     action_taken = "usuario expulsado"
                 elif punishment == "timeout":
-                    await member.timeout(datetime.timedelta(hours=1), reason=f"AstroCube Anti-Raid: {detail}")
+                    await member.timeout(datetime.timedelta(hours=1), reason=f"Nebula Security Anti-Raid: {detail}")
                     action_taken = "usuario silenciado 1 hora"
                 else:
                     removable = [r for r in member.roles if r.name != "@everyone" and r < guild.me.top_role]
                     if removable:
-                        await member.remove_roles(*removable, reason=f"AstroCube Anti-Raid: {detail}")
+                        await member.remove_roles(*removable, reason=f"Nebula Security Anti-Raid: {detail}")
                     action_taken = "roles retirados"
         except discord.HTTPException as exc:
             action_taken = f"error al castigar ({exc})"
@@ -176,7 +176,7 @@ class AntiNuke(commands.Cog):
         if backup_cog is None:
             return None
         found, counts = await backup_cog.restore_from_auto(
-            guild, reason=f"Auto-restauración de AstroCube Anti-Raid tras {module_key}"
+            guild, reason=f"Auto-restauración de Nebula Security Anti-Raid tras {module_key}"
         )
         if not found:
             return "No había ninguna copia automática todavía (se genera sola cada hora). Considera usar `/backup create` ahora."

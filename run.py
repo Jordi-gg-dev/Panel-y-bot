@@ -1,5 +1,5 @@
 """
-AstroCube - Punto de entrada único para Railway.
+Nebula Security - Punto de entrada único para Railway.
 
 Antes, el bot de Discord y el panel web eran dos servicios de Railway
 separados. El problema: Railway NO permite compartir un mismo volumen (ni

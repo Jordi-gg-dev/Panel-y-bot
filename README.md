@@ -1,6 +1,6 @@
-# 🛰️ AstroCube — Bot + Panel (proyecto único)
+# 🛰️ Nebula Security — Bot + Panel (proyecto único)
 
-Este proyecto contiene el bot de Discord **AstroCube Anti-Raid** y su panel web de administración **en un solo sitio**. Antes eran dos proyectos separados que se desplegaban como dos servicios de Railway; se han unido porque Railway no permite compartir un mismo volumen/archivo entre dos servicios distintos, y eso hacía que el panel y el bot NO vieran de verdad los mismos datos (por ejemplo, los mensajes privados que recibía el bot no llegaban a aparecer en el panel). Ahora ambos corren dentro del mismo proceso y comparten el archivo de verdad.
+Este proyecto contiene el bot de Discord **Nebula Security Anti-Raid** y su panel web de administración **en un solo sitio**. Antes eran dos proyectos separados que se desplegaban como dos servicios de Railway; se han unido porque Railway no permite compartir un mismo volumen/archivo entre dos servicios distintos, y eso hacía que el panel y el bot NO vieran de verdad los mismos datos (por ejemplo, los mensajes privados que recibía el bot no llegaban a aparecer en el panel). Ahora ambos corren dentro del mismo proceso y comparten el archivo de verdad.
 
 **Acceso al panel**: cualquier cuenta de Discord puede iniciar sesión, pero solo puede gestionar un servidor si es su dueño o tiene permiso de Administrador/Gestionar Servidor ahí. Los IDs en `OWNER_IDS` son "superadmins": ven todos los servidores del bot y acceden a las páginas Global (dar/quitar Premium a mano, código personalizado, etc.).
 

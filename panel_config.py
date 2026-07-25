@@ -1,4 +1,4 @@
-"""AstroCube Panel - Configuración (lee .env)."""
+"""Nebula Security Panel - Configuración (lee .env)."""
 
 import os
 from dotenv import load_dotenv
@@ -40,7 +40,7 @@ STRIPE_PRICE_ID: str = os.getenv("STRIPE_PRICE_ID", "")
 # En Railway, pon aqui el dominio que te genere (ej: https://tu-panel.up.railway.app)
 PUBLIC_BASE_URL: str = os.getenv("PUBLIC_BASE_URL", "http://localhost:5000")
 
-BOT_NAME = "AstroCube Anti-Raid"
+BOT_NAME = "Nebula Security Anti-Raid"
 
 # Enlace de invitación a tu servidor de Discord de soporte/comunidad, para el
 # botón "Únete a mi Servidor" del panel. Sobreescribible desde el .env.

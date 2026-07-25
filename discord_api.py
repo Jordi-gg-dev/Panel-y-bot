@@ -1,5 +1,5 @@
 """
-AstroCube Panel - Pequeño wrapper sobre la API REST de Discord.
+Nebula Security Panel - Pequeño wrapper sobre la API REST de Discord.
 
 El panel NO necesita que el bot esté corriendo: habla directamente con la
 API de Discord usando el mismo token del bot (para leer servidores/canales

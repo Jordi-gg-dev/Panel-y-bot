@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Información general, historial de incidentes y
+Nebula Security Anti-Raid - Información general, historial de incidentes y
 configuración de verificación del servidor.
 """
 
@@ -37,7 +37,7 @@ _LEVEL_MAP = {
 
 
 class Info(commands.Cog):
-    """Información, incidentes y verificación de AstroCube Anti-Raid."""
+    """Información, incidentes y verificación de Nebula Security Anti-Raid."""
 
     verification_group = app_commands.Group(
         name="verification", description="Configura el nivel de verificación de entrada del servidor",
@@ -65,7 +65,7 @@ class Info(commands.Cog):
     async def before_purge_old_incidents(self):
         await self.bot.wait_until_ready()
 
-    @app_commands.command(name="help", description="Muestra todos los comandos de AstroCube Anti-Raid")
+    @app_commands.command(name="help", description="Muestra todos los comandos de Nebula Security Anti-Raid")
     @app_commands.default_permissions(administrator=True)
     @checks.is_admin()
     async def help_command(self, interaction: discord.Interaction):
@@ -86,7 +86,7 @@ class Info(commands.Cog):
     async def ping(self, interaction: discord.Interaction):
         await interaction.response.send_message(embed=embeds.info("🏓 Pong", f"Latencia: **{round(self.bot.latency * 1000)}ms**"))
 
-    @app_commands.command(name="botinfo", description="Muestra información sobre AstroCube Anti-Raid")
+    @app_commands.command(name="botinfo", description="Muestra información sobre Nebula Security Anti-Raid")
     @app_commands.default_permissions(administrator=True)
     @checks.is_admin()
     async def botinfo(self, interaction: discord.Interaction):
@@ -142,7 +142,7 @@ class Info(commands.Cog):
         delta = datetime.timedelta(seconds=int(time.time() - self.bot.start_time))
         await interaction.response.send_message(embed=embeds.info("⏱️ Uptime", f"**{str(delta)}**"))
 
-    @app_commands.command(name="invite", description="Genera el enlace para añadir AstroCube Anti-Raid a otro servidor")
+    @app_commands.command(name="invite", description="Genera el enlace para añadir Nebula Security Anti-Raid a otro servidor")
     @app_commands.default_permissions(administrator=True)
     @checks.is_admin()
     async def invite(self, interaction: discord.Interaction):
@@ -150,11 +150,11 @@ class Info(commands.Cog):
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Invitar al bot", style=discord.ButtonStyle.link, url=url, emoji="🤖"))
         view.add_item(discord.ui.Button(label="Únete a nuestro servidor", style=discord.ButtonStyle.link, url=config.SUPPORT_SERVER_INVITE, emoji="💬"))
-        await interaction.response.send_message(embed=embeds.info("🔗 Invitar a AstroCube Anti-Raid", f"[Haz clic aquí para invitarlo a otro servidor]({url})"), view=view, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.info("🔗 Invitar a Nebula Security Anti-Raid", f"[Haz clic aquí para invitarlo a otro servidor]({url})"), view=view, ephemeral=True)
 
-    @app_commands.command(name="soporte", description="Muestra el enlace para unirte al servidor de soporte de AstroCube")
+    @app_commands.command(name="soporte", description="Muestra el enlace para unirte al servidor de soporte de Nebula Security")
     async def soporte(self, interaction: discord.Interaction):
-        embed = embeds.info("💬 Servidor de soporte", "¿Necesitas ayuda, quieres proponer una idea o seguir las novedades de AstroCube? Únete a nuestro servidor de Discord.")
+        embed = embeds.info("💬 Servidor de soporte", "¿Necesitas ayuda, quieres proponer una idea o seguir las novedades de Nebula Security? Únete a nuestro servidor de Discord.")
         view = discord.ui.View()
         view.add_item(discord.ui.Button(label="Únete a nuestro servidor", style=discord.ButtonStyle.link, url=config.SUPPORT_SERVER_INVITE, emoji="💬"))
         await interaction.response.send_message(embed=embed, view=view)
@@ -210,7 +210,7 @@ class Info(commands.Cog):
             role = member.guild.get_role(int(role_id))
             if role:
                 try:
-                    await member.add_roles(role, reason="Autorole AstroCube Anti-Raid")
+                    await member.add_roles(role, reason="Autorole Nebula Security Anti-Raid")
                 except discord.HTTPException:
                     pass
 

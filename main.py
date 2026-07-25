@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid 🛡️
+Nebula Security Anti-Raid 🛡️
 Bot defensivo multi-servidor: anti-nuke, anti-spam, anti-raid, lockdown y
 backups. Pensado para poder añadirse a cualquier servidor de Discord.
 

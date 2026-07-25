@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Módulo de Lockdown (botón de pánico).
+Nebula Security Anti-Raid - Módulo de Lockdown (botón de pánico).
 
 Bloquea (y desbloquea con precisión) todo el servidor: guarda el estado
 anterior de cada canal antes de tocar nada, para poder revertirlo tal cual
@@ -17,7 +17,7 @@ from utils import embeds, checks
 
 
 class Lockdown(commands.Cog):
-    """Bloqueo de emergencia de AstroCube Anti-Raid."""
+    """Bloqueo de emergencia de Nebula Security Anti-Raid."""
 
     lockdown_group = app_commands.Group(
         name="lockdown", description="Bloqueo de emergencia del servidor",

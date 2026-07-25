@@ -1,5 +1,5 @@
 """
-AstroCube Panel - Panel web para gestionar AstroCube Anti-Raid.
+Nebula Security Panel - Panel web para gestionar Nebula Security Anti-Raid.
 
 Cualquier cuenta de Discord puede iniciar sesión, pero solo puede gestionar
 un servidor concreto si es su propietario o tiene permiso de Administrador /
@@ -1340,7 +1340,7 @@ def premium_portal(guild_id):
 def _premium_welcome_message(guild_name: str):
     """Construye el MD de bienvenida que recibe quien acaba de comprar Premium.
     Devuelve (title, description, fields, color_hex, footer)."""
-    title = "💎 ¡Gracias por activar AstroCube Premium!"
+    title = "💎 ¡Gracias por activar Nebula Security Premium!"
     description = (
         f"Tu servidor **{guild_name}** ya tiene Premium activo. "
         "Aquí tienes un resumen de todo lo que has desbloqueado y cómo usarlo:"
@@ -1355,7 +1355,7 @@ def _premium_welcome_message(guild_name: str):
         {"name": "🗂️ Historial ilimitado", "value": "Las sanciones e incidentes ya no se borran a los 7 días.", "inline": False},
         {"name": "💬 Asistencia 24/7", "value": f"Si tienes dudas o algo no funciona, únete a nuestro servidor de soporte y te ayudamos: {config.SUPPORT_SERVER_INVITE}", "inline": False},
     ]
-    footer = "AstroCube Anti-Raid · Premium"
+    footer = "Nebula Security Anti-Raid · Premium"
     return title, description, fields, "F1C40F", footer
 
 

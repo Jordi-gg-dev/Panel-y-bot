@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Moderación de Chat y AutoMod Avanzado.
+Nebula Security Anti-Raid - Moderación de Chat y AutoMod Avanzado.
 
 Dos grupos de protecciones independientes de Anti-Nuke/Anti-Raid/Anti-Spam:
 
@@ -40,7 +40,7 @@ URL_RE = re.compile(r"https?://\S+")
 
 
 class AutoMod(commands.Cog):
-    """Moderación de Chat + AutoMod Avanzado de AstroCube Anti-Raid."""
+    """Moderación de Chat + AutoMod Avanzado de Nebula Security Anti-Raid."""
 
     automod_group = app_commands.Group(
         name="automod", description="Interruptor general y submódulos avanzados (enlaces, tokens, malware, webhooks)",

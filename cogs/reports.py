@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Alertas (Premium).
+Nebula Security Anti-Raid - Alertas (Premium).
 
 Comandos /alertas para configurar el canal central de alertas, el aviso por
 MD al dueño en emergencias, y el reporte semanal automático. La lógica real
@@ -36,7 +36,7 @@ def _premium_required_embed() -> discord.Embed:
 
 
 class Reports(commands.Cog):
-    """Alertas centralizadas + reporte semanal de AstroCube Anti-Raid."""
+    """Alertas centralizadas + reporte semanal de Nebula Security Anti-Raid."""
 
     alertas_group = app_commands.Group(
         name="alertas", description="Alertas centralizadas Premium: tiempo real, MD al dueño y reporte semanal",

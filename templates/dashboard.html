@@ -4,15 +4,15 @@
 <div class="card mb-6">
   <div class="flex flex-col sm:flex-row sm:items-center gap-5">
     <div class="w-11 h-11 shrink-0">
-      <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="AstroCube" class="w-full h-full">
+      <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Nebula Security" class="w-full h-full">
     </div>
     <div class="flex-1 min-w-0">
-      <div class="text-[11px] tracking-[0.15em] uppercase text-slate-500 font-semibold mb-1">Panel de AstroCube</div>
+      <div class="text-[11px] tracking-[0.15em] uppercase text-slate-500 font-semibold mb-1">Panel de Nebula Security</div>
       <h1 class="text-xl font-bold text-white">Servidores</h1>
       {% if is_filtered_view %}
-      <p class="text-sm text-slate-400 mt-1">Servidores donde eres administrador y AstroCube Anti-Raid está instalado. Elige uno para gestionarlo.</p>
+      <p class="text-sm text-slate-400 mt-1">Servidores donde eres administrador y Nebula Security Anti-Raid está instalado. Elige uno para gestionarlo.</p>
       {% else %}
-      <p class="text-sm text-slate-400 mt-1">Servidores donde AstroCube Anti-Raid está instalado. Elige uno para gestionarlo.</p>
+      <p class="text-sm text-slate-400 mt-1">Servidores donde Nebula Security Anti-Raid está instalado. Elige uno para gestionarlo.</p>
       {% endif %}
     </div>
     {% if bot_user %}
@@ -21,7 +21,7 @@
         <img src="https://cdn.discordapp.com/avatars/{{ bot_user['id'] }}/{{ bot_user['avatar'] }}.png" class="w-8 h-8 rounded-full">
       {% endif %}
       <div class="text-xs">
-        <div class="text-white font-semibold leading-none">{{ bot_user.get('username', 'AstroCube') }}</div>
+        <div class="text-white font-semibold leading-none">{{ bot_user.get('username', 'Nebula Security') }}</div>
         <div class="text-emerald-400 font-medium mt-1.5 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> En línea</div>
       </div>
     </div>
@@ -64,7 +64,7 @@
 {% if not guilds %}
   <div class="card text-center text-slate-400">
     {% if is_filtered_view %}
-      <p class="mb-4">No administras ningún servidor donde esté AstroCube Anti-Raid. Invita el bot a tu servidor para empezar a gestionarlo.</p>
+      <p class="mb-4">No administras ningún servidor donde esté Nebula Security Anti-Raid. Invita el bot a tu servidor para empezar a gestionarlo.</p>
     {% else %}
       <p class="mb-4">No se ha podido cargar ningún servidor. Comprueba que <code>DISCORD_TOKEN</code> en el <code>.env</code> del panel sea correcto, o invita el bot a un servidor.</p>
     {% endif %}

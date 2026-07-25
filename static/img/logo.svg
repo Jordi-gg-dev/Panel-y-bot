@@ -1,71 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
   <defs>
-    <radialGradient id="glow" cx="50%" cy="46%" r="55%">
-      <stop offset="0%" stop-color="#bfe3ff" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#6a5bd6" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="faceTop" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#eaf7ff"/>
-      <stop offset="100%" stop-color="#bcdcff"/>
+    <linearGradient id="neon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e9b8ff"/>
+      <stop offset="45%" stop-color="#b855f0"/>
+      <stop offset="100%" stop-color="#8b2fd6"/>
     </linearGradient>
-    <linearGradient id="faceRight" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#a9c7f5"/>
-      <stop offset="100%" stop-color="#7d90e6"/>
-    </linearGradient>
-    <linearGradient id="faceLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#8ea3ea"/>
-      <stop offset="100%" stop-color="#5c63c9"/>
-    </linearGradient>
-    <linearGradient id="innerTop" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#dceeff"/>
-    </linearGradient>
-    <filter id="blur" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="9"/>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
   </defs>
 
-  <circle cx="100" cy="100" r="70" fill="url(#glow)" filter="url(#blur)"/>
-
-  <g opacity="0.9">
-    <circle cx="42" cy="55" r="1.4" fill="#ffffff" opacity="0.8"/>
-    <circle cx="150" cy="48" r="1" fill="#ffffff" opacity="0.6"/>
-    <circle cx="163" cy="95" r="1.3" fill="#ffffff" opacity="0.7"/>
-    <circle cx="153" cy="150" r="1" fill="#ffffff" opacity="0.55"/>
-    <circle cx="60" cy="160" r="1.3" fill="#ffffff" opacity="0.65"/>
-    <circle cx="34" cy="120" r="1" fill="#ffffff" opacity="0.5"/>
-    <circle cx="100" cy="30" r="1" fill="#ffffff" opacity="0.6"/>
-  </g>
-
-  <polygon points="100,40 152,70 152,130 100,160 48,130 48,70" fill="url(#faceLeft)" opacity="0.18"/>
-
-  <polygon points="100,40 152,70 100,100 48,70" fill="url(#faceTop)"/>
-  <polygon points="152,70 152,130 100,160 100,100" fill="url(#faceRight)"/>
-  <polygon points="48,70 100,100 100,160 48,130" fill="url(#faceLeft)"/>
-
-  <g stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.6" fill="none">
-    <polygon points="100,40 152,70 100,100 48,70"/>
-    <polygon points="152,70 152,130 100,160 100,100"/>
-    <polygon points="48,70 100,100 100,160 48,130"/>
-  </g>
-
-  <g stroke="#ffffff" stroke-opacity="0.5" stroke-width="0.5" fill="none">
-    <line x1="100" y1="40" x2="100" y2="100"/>
-    <line x1="152" y1="70" x2="100" y2="100"/>
-    <line x1="48" y1="70" x2="100" y2="100"/>
-    <line x1="100" y1="160" x2="100" y2="100"/>
-    <line x1="152" y1="130" x2="100" y2="100"/>
-    <line x1="48" y1="130" x2="100" y2="100"/>
-  </g>
-
-  <g transform="translate(100,97) scale(0.34)">
-    <polygon points="0,-60 52,-30 0,0 -52,-30" fill="url(#innerTop)"/>
-    <polygon points="52,-30 52,30 0,60 0,0" fill="#c3d6f7"/>
-    <polygon points="-52,-30 0,0 0,60 -52,30" fill="#9fb2ea"/>
-    <g stroke="#ffffff" stroke-opacity="0.6" stroke-width="1.4" fill="none">
-      <polygon points="0,-60 52,-30 0,0 -52,-30"/>
-      <polygon points="52,-30 52,30 0,60 0,0"/>
-      <polygon points="-52,-30 0,0 0,60 -52,30"/>
-    </g>
+  <!-- Marca "Nebula Security": ala/chevron neon morado, simetrica -->
+  <g fill="none" stroke="url(#neon)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)">
+    <path d="
+      M 22 46
+      L 96 108
+      L 100 118
+      L 104 108
+      L 178 46
+      L 152 100
+      L 172 108
+      L 148 118
+      L 100 168
+      L 52 118
+      L 28 108
+      L 48 100
+      Z
+    "/>
+    <path d="M 100 118 L 90 138 L 100 150 L 110 138 Z"/>
   </g>
 </svg>

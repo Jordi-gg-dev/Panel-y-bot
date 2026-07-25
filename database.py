@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Capa de base de datos (SQLite / aiosqlite).
+Nebula Security Anti-Raid - Capa de base de datos (SQLite / aiosqlite).
 """
 
 import time

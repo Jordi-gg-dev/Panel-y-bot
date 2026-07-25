@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Sistema de Niveles (XP).
+Nebula Security Anti-Raid - Sistema de Niveles (XP).
 
 Cada mensaje (con un tiempo de espera entre mensajes, configurable) da una
 cantidad aleatoria de XP al autor. Al subir de nivel se avisa en el canal
@@ -23,7 +23,7 @@ DEFAULT_COOLDOWN = 60
 
 
 class Leveling(commands.Cog):
-    """Sistema de XP y niveles de AstroCube Anti-Raid."""
+    """Sistema de XP y niveles de Nebula Security Anti-Raid."""
 
     niveles_group = app_commands.Group(
         name="niveles", description="Configuracion del sistema de niveles (XP)",

@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Módulo de Backups.
+Nebula Security Anti-Raid - Módulo de Backups.
 
 Guarda una foto de los roles y canales del servidor y permite restaurar lo
 que falte tras un ataque. La restauración es siempre ADITIVA: nunca borra
@@ -105,7 +105,7 @@ async def _restore_snapshot(guild: discord.Guild, data: dict, reason: str) -> tu
 
 
 class Backup(commands.Cog):
-    """Copias de seguridad de AstroCube Anti-Raid."""
+    """Copias de seguridad de Nebula Security Anti-Raid."""
 
     backup_group = app_commands.Group(
         name="backup", description="Copias de seguridad de canales y roles",

@@ -1,5 +1,5 @@
 """
-AstroCube Anti-Raid - Comandos reservados a los desarrolladores del bot
+Nebula Security Anti-Raid - Comandos reservados a los desarrolladores del bot
 (config.OWNER_IDS), no a cada servidor. Gestión multi-servidor del propio bot.
 """
 
@@ -15,7 +15,7 @@ from utils import embeds, checks
 
 
 class Owner(commands.Cog):
-    """Comandos de owner de AstroCube Anti-Raid."""
+    """Comandos de owner de Nebula Security Anti-Raid."""
 
     owner_group = app_commands.Group(
         name="owner", description="Comandos exclusivos de los desarrolladores del bot",
@@ -123,7 +123,7 @@ class Owner(commands.Cog):
     @owner_group.command(name="shutdown", description="Apaga el bot de forma segura")
     @checks.is_bot_owner()
     async def owner_shutdown(self, interaction: discord.Interaction):
-        await interaction.response.send_message(embed=embeds.warning("Apagando AstroCube Anti-Raid...", "🛰️"), ephemeral=True)
+        await interaction.response.send_message(embed=embeds.warning("Apagando Nebula Security Anti-Raid...", "🛰️"), ephemeral=True)
         await self.bot.close()
 
 

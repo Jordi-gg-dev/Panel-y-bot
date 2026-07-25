@@ -1,4 +1,4 @@
-"""AstroCube Anti-Raid - Constructores de embeds con la identidad visual del bot."""
+"""Nebula Security Anti-Raid - Constructores de embeds con la identidad visual del bot."""
 
 import datetime
 import discord
